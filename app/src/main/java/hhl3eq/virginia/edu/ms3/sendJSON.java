@@ -21,6 +21,7 @@ import org.json.JSONObject;
 
 import android.media.MediaRecorder;
 import android.media.MediaPlayer;
+import android.media.audiofx.Visualizer;
 
 public class sendJSON extends Activity {
     int rdgrpChoice = 0;      // initial selection
