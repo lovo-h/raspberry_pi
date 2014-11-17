@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="red">#FF0000</color>
+    <color name="green">#00FF00</color>
+    <color name="blue">#0000FF</color>
+
+    <color name="drk_red">#440000</color>
+    <color name="drk_red2">#330000</color>
+    <color name="lit_red">#FF1111</color>
+    <color name="lit_red2">#dd1111</color>
+    <color name="lit_red3">#AA1111</color>
+
+    <color name="drk_green">#004400</color>
+    <color name="drk_green2">#003300</color>
+    <color name="lit_green">#11FF11</color>
+    <color name="lit_green2">#11DD11</color>
+    <color name="lit_green3">#11AA11</color>
+
+    <color name="grey1">#EEEEEE</color>
+    <color name="grey2">#CCCCCC</color>
+    <color name="grey3">#AAAAAA</color>
+
+    <color name="drk_grey">#111111</color>
+    <color name="drk_grey2">#333333</color>
+
+    <color name="yellow1">#F9E60E</color>
+    <color name="yellow2">#F9F89D</color>
+    <color name="orange4">#F7BE45</color>
+    <color name="orange5">#F7D896</color>
+    <color name="cyan">#19FCDA</color>
+    <color name="blue25">#D9F7F2</color>
+    <color name="grey05">#ACA899</color>
+</resources>

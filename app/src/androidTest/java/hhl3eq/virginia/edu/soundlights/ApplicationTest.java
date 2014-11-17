@@ -1,4 +1,4 @@
-package hhl3eq.virginia.edu.ms3;
+package hhl3eq.virginia.edu.soundlights;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
