@@ -331,6 +331,7 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    //start recording
     public void startRecorder(View view) {
         if (!isRecording) {
             lblRecorderFeedback.setText("Recording...");
