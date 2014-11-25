@@ -148,7 +148,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void loggedIn(boolean isLogged) {
         isLoggedIn = isLogged;
-        uploadFile.setEnabled(isLogged);
+        //uploadFile.setEnabled(isLogged);
         //login.setText(isLogged ? "Logout" : "Login");
     }
 
