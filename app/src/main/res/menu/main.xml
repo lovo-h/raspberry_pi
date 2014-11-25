@@ -16,10 +16,18 @@
         app:showAsAction="collapseActionView|ifRoom" />
 
     <item
+        android:id="@+id/action_dropbox"
+        android:icon="@drawable/db"
+        android:title="@string/action_dropbox"
+        app:showAsAction="collapseActionView|ifRoom" />
+
+    <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_action_settings"
         android:title="@string/action_settings"
         app:showAsAction="collapseActionView|ifRoom" />
+
+
 
 </menu>
 

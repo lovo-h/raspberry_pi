@@ -1,4 +1,5 @@
 package hhl3eq.virginia.edu.soundlights;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.media.AudioFormat;
@@ -34,6 +35,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -41,6 +43,8 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
+import com.dropbox.client2.exception.DropboxException;
+import com.dropbox.client2.exception.DropboxUnlinkedException;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session.AccessType;
@@ -85,7 +89,7 @@ public class MainActivity extends ActionBarActivity {
     private final static String ACCESS_SECRET = "yxiafrv3micrcc9";
     private boolean isLoggedIn;
     private Button login;
-    private Button uploadFile;
+    private Button uploadBtn;
 
     // TODO: remove after test
 //    private final Semaphore inB = new Semaphore(1);
@@ -96,12 +100,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         new SetupViewsOnLoadHelper().execute(); // loads things in the background
 
-        /*
-        login = (Button) findViewById(R.id.dropbox_login);
-        login.setOnClickListener(this);
-        uploadFile = (Button) findViewById(R.id.upload_file);
-        uploadFile.setOnClickListener(this);*/
-
+        uploadBtn = (Button) findViewById(R.id.upload);
 
         loggedIn(false);
 
@@ -148,7 +147,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void loggedIn(boolean isLogged) {
         isLoggedIn = isLogged;
-        //uploadFile.setEnabled(isLogged);
+        uploadBtn.setEnabled(isLogged);
         //login.setText(isLogged ? "Logout" : "Login");
     }
 
@@ -346,6 +345,14 @@ public class MainActivity extends ActionBarActivity {
                 startPlayingRecord(getWindow().getDecorView().findViewById(android.R.id.content));
                 toggleIcon(item, isPlaying, R.drawable.pause1, R.drawable.play1);
                 break;
+            case R.id.action_dropbox:
+                if (isLoggedIn) {
+                    dropbox.getSession().unlink();
+                    loggedIn(false);
+                } else {
+                    dropbox.getSession().startAuthentication(MainActivity.this);
+                }
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -423,15 +430,6 @@ public class MainActivity extends ActionBarActivity {
             rawToWave(file, waveFile);
         } catch (IOException e) {
             System.out.println(e.getMessage());
-        }
-    }
-
-    public void dbLogin(View view){
-        if (isLoggedIn) {
-            dropbox.getSession().unlink();
-            loggedIn(false);
-        } else {
-            dropbox.getSession().startAuthentication(MainActivity.this);
         }
     }
 
@@ -713,6 +711,49 @@ public class MainActivity extends ActionBarActivity {
             result.add(nextElement);
             result.addAll(merge(l1, l2));
             return result;
+        }
+    }
+
+    public void upload (View view){
+        new UploadFileToDropbox(this,dropbox, waveFile ).execute();
+    }
+
+    private class UploadFileToDropbox extends AsyncTask<Void, Void, Boolean> {
+
+        private DropboxAPI<?> dropbox;
+        private Context context;
+        private File file;
+
+        public UploadFileToDropbox(Context context, DropboxAPI<?> dropbox,
+                                    File file) {
+            this.context = context.getApplicationContext();
+            this.dropbox = dropbox;
+            this.file = file;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                FileInputStream fileInputStream = new FileInputStream(file);
+                dropbox.putFile("/values.wav", fileInputStream, file.length(), null, null);
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (DropboxException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result) {
+                Toast.makeText(context, "File Uploaded Successfully!",
+                        Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(context, "Failed to upload file", Toast.LENGTH_LONG)
+                        .show();
+            }
         }
     }
 }
