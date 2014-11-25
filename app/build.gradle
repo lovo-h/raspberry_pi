@@ -4,6 +4,11 @@ android {
     compileSdkVersion 21
     buildToolsVersion "20.0.0"
 
+    packagingOptions {
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/notice.txt'
+    }
+
     defaultConfig {
         applicationId "hhl3eq.virginia.edu.soundlights"
         minSdkVersion 8
@@ -22,4 +27,19 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.0'
+    //compile files('libs/dropbox-sync-sdk-android.jar')
+    compile files("$buildDir/native-libs/native-libs.jar")
+    //compile files ('libs/bcprov-jdk16-146.jar', 'libs/commons-logging-1.1.1.jar', 'libs/httpclient-4.0.3.jar', 'libs/httpcore-4.0.1.jar', 'libs/httpmime-4.0.3.jar', 'libs/json_simple-1.1.jar')
+}
+
+task nativeLibsToJar(type: Zip) {
+    destinationDir file("$buildDir/native-libs")
+    baseName 'native-libs'
+    extension 'jar'
+    from fileTree(dir: 'libs', include: '**/*.so')
+    into 'lib/'
+}
+
+tasks.withType(Compile) {
+    compileTask -> compileTask.dependsOn(nativeLibsToJar)
 }

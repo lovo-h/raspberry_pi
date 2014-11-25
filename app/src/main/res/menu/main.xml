@@ -20,5 +20,6 @@
         android:icon="@drawable/ic_action_settings"
         android:title="@string/action_settings"
         app:showAsAction="collapseActionView|ifRoom" />
+
 </menu>
 

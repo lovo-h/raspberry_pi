@@ -310,7 +310,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="59dp"
             android:layout_below="@+id/linearLayout"
-            android:layout_centerHorizontal="true">
+            android:layout_centerHorizontal="true"
+            android:id="@+id/linearLayout2">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -323,6 +324,12 @@
                 android:layout_marginBottom="20dp"
                 android:layout_gravity="center_horizontal" />
 
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageButton"
+                android:layout_gravity="center_horizontal" />
+
             <ProgressBar
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="300dp"
@@ -331,6 +338,20 @@
                 android:layout_gravity="center"
                 android:layout_below="@+id/linearLayout"
                 android:layout_centerHorizontal="true" />
+
         </LinearLayout>
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/dropboxBtn"
+            android:drawableLeft="@drawable/dropbox1"
+            android:background="@android:color/transparent"
+            android:layout_toEndOf="@+id/linearLayout3"
+            android:onClick="dbLogin"
+            android:layout_centerVertical="true"
+            android:layout_alignRight="@+id/linearLayout2"
+            android:layout_alignEnd="@+id/linearLayout2" />
     </RelativeLayout>
 </RelativeLayout>
