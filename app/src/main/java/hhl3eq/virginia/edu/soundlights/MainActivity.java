@@ -102,7 +102,7 @@ public class MainActivity extends ActionBarActivity {
     private Button login;
     private Button uploadBtn;
     private Button displayBtn;
-    private GridView gridView;
+    private GridView gridFiles;
     String[] fnames = null;
 
     // TODO: remove after test
@@ -711,10 +711,11 @@ public class MainActivity extends ActionBarActivity {
             fnames = result.toArray(new String[result.size()]);
 
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, fnames);
-            gridView = (GridView) findViewById(R.id.gridView);
-            gridView.setAdapter(adapter);
 
-            gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            gridFiles = (GridView) findViewById(R.id.grdFiles);
+            gridFiles.setAdapter(adapter);
+
+            gridFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     targetFile = new File(Environment.getExternalStorageDirectory(), fnames[position]);
@@ -722,6 +723,11 @@ public class MainActivity extends ActionBarActivity {
                     download.execute();
                 }
             });
+
+
+
+
+
         }
     };
 

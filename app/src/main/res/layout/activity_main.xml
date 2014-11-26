@@ -6,35 +6,6 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:id="@+id/filesMenu"
-        android:layout_toLeftOf="@+id/settingsMenu">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:background="@drawable/custom_bg2">
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/txtFilesHeader"
-                android:text="@string/txtFilesHeader"
-                android:visibility="visible"
-                android:textStyle="bold" />
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/editText"
-                android:text="recording.wav" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:id="@+id/settingsMenu"
         android:layout_alignParentTop="true"
@@ -43,7 +14,7 @@
         android:gravity="top"
         android:focusableInTouchMode="false"
         android:layout_marginRight="10dp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_gravity="right|center_vertical" >
 
         <LinearLayout
@@ -225,9 +196,8 @@
         android:background="@drawable/main_custom_bg"
         android:layout_gravity="left|center_vertical"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/settingsMenu"
-        android:layout_toLeftOf="@+id/filesMenu"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/settingsMenu">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -386,7 +356,44 @@
             android:layout_alignLeft="@+id/linearLayout"
             android:layout_alignStart="@+id/linearLayout" />
 
-            android:scrollbars="vertical"
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:id="@+id/lytFiles"
+            android:visibility="visible"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:id="@+id/filesMenu">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:background="@drawable/custom_bg2">
+
+                    <EditText
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtFilesHeader"
+                        android:text="@string/txtFilesHeader"
+                        android:visibility="visible"
+                        android:textStyle="bold" />
+
+                    <GridView
+                        android:layout_width="150dp"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/grdFiles" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+
+        android:scrollbars="vertical"
     </RelativeLayout>
 
 </RelativeLayout>
