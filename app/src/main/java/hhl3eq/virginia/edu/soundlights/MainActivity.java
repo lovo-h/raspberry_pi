@@ -99,6 +99,7 @@ public class MainActivity extends ActionBarActivity {
     private boolean isLoggedIn;
     private Button login;
     private Button uploadBtn;
+    private Button displayBtn;
     private GridView gridView;
     String[] fnames = null;
 
@@ -112,6 +113,7 @@ public class MainActivity extends ActionBarActivity {
         new SetupViewsOnLoadHelper().execute(); // loads things in the background
 
         uploadBtn = (Button) findViewById(R.id.upload);
+        displayBtn = (Button) findViewById(R.id.display);
 
         loggedIn(false);
 
@@ -158,7 +160,14 @@ public class MainActivity extends ActionBarActivity {
 
     public void loggedIn(boolean isLogged) {
         isLoggedIn = isLogged;
-        uploadBtn.setEnabled(isLogged);
+        if(isLogged) {
+            uploadBtn.setVisibility(View.VISIBLE);
+            displayBtn.setVisibility(View.VISIBLE);
+        }
+        else{
+            uploadBtn.setVisibility(View.GONE);
+            displayBtn.setVisibility(View.GONE);
+        }
         //login.setText(isLogged ? "Logout" : "Login");
     }
 
@@ -728,7 +737,6 @@ public class MainActivity extends ActionBarActivity {
     public void upload(View view) {
         UploadFile upload = new UploadFile(this, dropbox, waveFile);
         upload.execute();
-        //new UploadFileToDropbox(this,dropbox, waveFile ).execute();
     }
 
     public void download(View view) {
@@ -760,50 +768,5 @@ public class MainActivity extends ActionBarActivity {
     public void displayFiles(View view) {
         DisplayFiles display = new DisplayFiles(dropbox, handler);
         display.execute();
-
-
-        /*
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fnames);
-        gridView = (GridView) findViewById(R.id.gridView);
-        gridView.setAdapter(adapter);/*
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                DownloadFile download = new DownloadFile(getApplicationContext(), dropbox, waveFile);
-                download.execute();
-            }
-        });*/
-
     }
-/*
-    public class DisplayFiles extends AsyncTask<Void, Void, Boolean>  {
-        private DropboxAPI<?> dropbox;
-        //private Context context;
-        //private File file;
-
-        public DisplayFiles(DropboxAPI<?> dropbox) {
-            //this.context = context.getApplicationContext();
-            this.dropbox = dropbox;
-            //this.file = file;
-        }
-
-        protected Boolean doInBackground(Void... params) {
-            try {
-                DropboxAPI.Entry dirent = dropbox.metadata("/", 1000, null, true, null);
-                //ArrayList<DropboxAPI.Entry> files = new ArrayList<DropboxAPI.Entry>();
-                ArrayList<String> dir = new ArrayList<String>();
-                for ( DropboxAPI.Entry ent: dirent.contents){
-                    //files.add(ent);// Add it to the list of thumbs we can choose from
-                    //dir.add(new String(files.get(i++).toString()));
-                    dir.add(ent.fileName());
-                }
-                fnames = dir.toArray(new String[dir.size()]);
-
-                return true;
-            } catch (DropboxException e) {
-                e.printStackTrace();
-            }
-            return false;
-        }
-    }*/
 }
