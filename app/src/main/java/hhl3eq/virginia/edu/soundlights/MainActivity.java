@@ -738,20 +738,25 @@ public class MainActivity extends ActionBarActivity {
     private final Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             ArrayList<String> result = msg.getData().getStringArrayList("data");
+            fnames = result.toArray(new String[result.size()]);
 
-            for (String fileName : result) {
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, fnames);
+            gridView = (GridView) findViewById(R.id.gridView);
+            gridView.setAdapter(adapter);
 
-                /*TextView tv = new TextView(DropboxActivity.this);
-                tv.setText(fileName);
+            gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    DownloadFile download = new DownloadFile(getApplicationContext(), dropbox, waveFile);
+                    download.execute();
+                }
+            });
 
-                container.addView(tv);*/
-
-            }
         }
     };
 
     public void displayFiles(View view) {
-        DisplayFiles display = new DisplayFiles(dropbox);
+        DisplayFiles display = new DisplayFiles(dropbox, handler);
         display.execute();
 
 
