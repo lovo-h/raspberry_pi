@@ -77,6 +77,7 @@ public class MainActivity extends ActionBarActivity {
     private ProgressBar mProgressBar;
     private File file = new File(Environment.getExternalStorageDirectory(), "values.raw");
     private File waveFile = new File(Environment.getExternalStorageDirectory(), "values.wav");
+    private File targetFile;
     public int bufferSize = 0;
     private boolean isPlaying = false;
     private boolean isRecording = false;
@@ -747,7 +748,8 @@ public class MainActivity extends ActionBarActivity {
             gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    DownloadFile download = new DownloadFile(getApplicationContext(), dropbox, waveFile);
+                    targetFile = new File(Environment.getExternalStorageDirectory(), fnames[position]);
+                    DownloadFile download = new DownloadFile(getApplicationContext(), dropbox, targetFile);
                     download.execute();
                 }
             });
