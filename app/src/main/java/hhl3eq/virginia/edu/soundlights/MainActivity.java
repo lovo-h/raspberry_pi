@@ -2,21 +2,29 @@ package hhl3eq.virginia.edu.soundlights;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.AsyncTask;
+import android.os.DropBoxManager;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
@@ -90,6 +98,8 @@ public class MainActivity extends ActionBarActivity {
     private boolean isLoggedIn;
     private Button login;
     private Button uploadBtn;
+    private GridView gridView;
+    String[] fnames = null;
 
     // TODO: remove after test
 //    private final Semaphore inB = new Semaphore(1);
@@ -714,46 +724,79 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    public void upload (View view){
-        new UploadFileToDropbox(this,dropbox, waveFile ).execute();
+    public void upload(View view) {
+        UploadFile upload = new UploadFile(this, dropbox, waveFile);
+        upload.execute();
+        //new UploadFileToDropbox(this,dropbox, waveFile ).execute();
     }
 
-    private class UploadFileToDropbox extends AsyncTask<Void, Void, Boolean> {
+    public void download(View view) {
+        DownloadFile download = new DownloadFile(this, dropbox, waveFile);
+        download.execute();
+    }
 
+    private final Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            ArrayList<String> result = msg.getData().getStringArrayList("data");
+
+            for (String fileName : result) {
+
+                /*TextView tv = new TextView(DropboxActivity.this);
+                tv.setText(fileName);
+
+                container.addView(tv);*/
+
+            }
+        }
+    };
+
+    public void displayFiles(View view) {
+        DisplayFiles display = new DisplayFiles(dropbox);
+        display.execute();
+
+
+        /*
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fnames);
+        gridView = (GridView) findViewById(R.id.gridView);
+        gridView.setAdapter(adapter);/*
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                DownloadFile download = new DownloadFile(getApplicationContext(), dropbox, waveFile);
+                download.execute();
+            }
+        });*/
+
+    }
+/*
+    public class DisplayFiles extends AsyncTask<Void, Void, Boolean>  {
         private DropboxAPI<?> dropbox;
-        private Context context;
-        private File file;
+        //private Context context;
+        //private File file;
 
-        public UploadFileToDropbox(Context context, DropboxAPI<?> dropbox,
-                                    File file) {
-            this.context = context.getApplicationContext();
+        public DisplayFiles(DropboxAPI<?> dropbox) {
+            //this.context = context.getApplicationContext();
             this.dropbox = dropbox;
-            this.file = file;
+            //this.file = file;
         }
 
-        @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                FileInputStream fileInputStream = new FileInputStream(file);
-                dropbox.putFile("/values.wav", fileInputStream, file.length(), null, null);
+                DropboxAPI.Entry dirent = dropbox.metadata("/", 1000, null, true, null);
+                //ArrayList<DropboxAPI.Entry> files = new ArrayList<DropboxAPI.Entry>();
+                ArrayList<String> dir = new ArrayList<String>();
+                for ( DropboxAPI.Entry ent: dirent.contents){
+                    //files.add(ent);// Add it to the list of thumbs we can choose from
+                    //dir.add(new String(files.get(i++).toString()));
+                    dir.add(ent.fileName());
+                }
+                fnames = dir.toArray(new String[dir.size()]);
+
                 return true;
-            } catch (IOException e) {
-                e.printStackTrace();
             } catch (DropboxException e) {
                 e.printStackTrace();
             }
             return false;
         }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            if (result) {
-                Toast.makeText(context, "File Uploaded Successfully!",
-                        Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(context, "Failed to upload file", Toast.LENGTH_LONG)
-                        .show();
-            }
-        }
-    }
+    }*/
 }

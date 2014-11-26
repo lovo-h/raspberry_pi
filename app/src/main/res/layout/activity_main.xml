@@ -324,11 +324,7 @@
                 android:layout_marginBottom="20dp"
                 android:layout_gravity="center_horizontal" />
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/imageButton"
-                android:layout_gravity="center_horizontal" />
+
 
             <ProgressBar
                 style="?android:attr/progressBarStyleHorizontal"
@@ -345,13 +341,31 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/dropboxBtn"
-            android:drawableLeft="@drawable/dropbox1"
-            android:background="@android:color/transparent"
-            android:layout_toEndOf="@+id/linearLayout3"
-            android:onClick="dbLogin"
-            android:layout_centerVertical="true"
-            android:layout_alignRight="@+id/linearLayout2"
-            android:layout_alignEnd="@+id/linearLayout2" />
+            android:text="@string/upload"
+            android:id="@+id/upload"
+            android:onClick="upload"
+            android:layout_below="@+id/linearLayout"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Button"
+            android:id="@+id/button"
+            android:onClick="displayFiles"
+            android:layout_above="@+id/linearLayout"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <GridView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/gridView"
+            android:layout_below="@+id/linearLayout"
+            android:layout_alignLeft="@+id/linearLayout2"
+            android:layout_alignStart="@+id/linearLayout2" />
+
     </RelativeLayout>
+
 </RelativeLayout>
