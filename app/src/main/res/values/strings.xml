@@ -21,5 +21,6 @@
     <string name="txtInputIP">172.26.166.135</string>
     <string name="upload">Upload the Recorded File</string>
     <string name="stop">Stop</string>
+    <string name="display">Display List of Files</string>
 
 </resources>
