@@ -13,22 +13,22 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            android:layout_height="fill_parent"
+            android:background="@drawable/custom_bg2">
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:background="@drawable/custom_bg2">
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtFilesHeader"
+                android:text="@string/txtFilesHeader"
+                android:visibility="visible"
+                android:textStyle="bold" />
 
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/txtFilesHeader"
-                    android:text="@string/txtFilesHeader"
-                    android:visibility="visible"
-                    android:textStyle="bold" />
-            </LinearLayout>
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText"
+                android:text="recording.wav" />
         </LinearLayout>
     </LinearLayout>
 
