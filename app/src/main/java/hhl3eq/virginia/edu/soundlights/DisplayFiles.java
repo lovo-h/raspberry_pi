@@ -21,8 +21,9 @@ public class DisplayFiles extends AsyncTask<Void, Void, ArrayList<String>>  {
     private DropboxAPI<?> dropbox;
     private Handler handler;
 
-    public DisplayFiles(DropboxAPI<?> dropbox) {
+    public DisplayFiles(DropboxAPI<?> dropbox, Handler handler) {
         this.dropbox = dropbox;
+        this.handler = handler;
     }
 
     protected ArrayList<String> doInBackground(Void... params) {
