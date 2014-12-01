@@ -16,20 +16,21 @@ public class DownloadFile extends AsyncTask<Void, Void, Boolean> {
     private DropboxAPI<?> dropbox;
     private Context context;
     private File file;
-    private File localFile = new File(Environment.getExternalStorageDirectory(), "downloaded_values.wav");
+    private File localFile;
 
     public DownloadFile(Context context, DropboxAPI<?> dropbox,
                       File file) {
         this.context = context.getApplicationContext();
         this.dropbox = dropbox;
         this.file = file;
+        localFile = new File(Environment.getExternalStorageDirectory(), file.getName());
     }
 
     @Override
     protected Boolean doInBackground(Void... params) {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(localFile);
-            dropbox.getFile("/values.wav", null, fileOutputStream, null);
+            dropbox.getFile("/" + file.getName(), null, fileOutputStream, null);
             return true;
         } catch (IOException e) {
             e.printStackTrace();
