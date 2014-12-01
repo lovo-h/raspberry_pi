@@ -195,9 +195,10 @@
         android:id="@+id/relativeLayout"
         android:background="@drawable/main_custom_bg"
         android:layout_gravity="left|center_vertical"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@+id/settingsMenu">
+        android:layout_alignParentTop="false"
+        android:layout_alignParentStart="false"
+        android:layout_toLeftOf="@+id/settingsMenu"
+        android:layout_toRightOf="@+id/lytFiles">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -356,44 +357,45 @@
             android:layout_alignLeft="@+id/linearLayout"
             android:layout_alignStart="@+id/linearLayout" />
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
+        android:scrollbars="vertical"
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="200dp"
+        android:layout_height="fill_parent"
+        android:id="@+id/lytFiles"
+        android:visibility="visible"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentEnd="false"
+        android:background="@drawable/custom_bg2"
+        android:layout_alignParentStart="true">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:id="@+id/lytFiles"
-            android:visibility="visible"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true">
+            android:id="@+id/filesMenu">
 
             <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:id="@+id/filesMenu">
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
 
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:background="@drawable/custom_bg2">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="@string/txtFilesHeader"
+                    android:id="@+id/txtFilesHeader"
+                    android:textStyle="bold" />
 
-                    <EditText
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/txtFilesHeader"
-                        android:text="@string/txtFilesHeader"
-                        android:visibility="visible"
-                        android:textStyle="bold" />
+                <GridView
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/grdFiles" />
 
-                    <GridView
-                        android:layout_width="150dp"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/grdFiles" />
-
-                </LinearLayout>
             </LinearLayout>
-        </RelativeLayout>
-
-        android:scrollbars="vertical"
+        </LinearLayout>
     </RelativeLayout>
 
 </RelativeLayout>
