@@ -376,14 +376,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void startSend(View view) {
-        try {
-            Toast.makeText(getBaseContext(), "Please wait. Now converting...", Toast.LENGTH_SHORT).show();
-            //TODO: delete after test
-            rawToDbl(file2);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-
         boolean chkip = chkIP.isChecked();
         boolean chkuva = chkUVA.isChecked();
 //        json = Tools.prepareJSON(rdgrpChoice);
@@ -710,6 +702,15 @@ public class MainActivity extends ActionBarActivity {
 
                         }
                     }
+
+                    try {
+                        Toast.makeText(getBaseContext(), "Please wait. Now converting...", Toast.LENGTH_SHORT).show();
+                        //TODO: delete after test
+                        rawToDbl(file2);
+                    } catch (IOException e) {
+                        System.out.println(e.getMessage());
+                    }
+
                 } catch (IOException e) {
                     //Toast.makeText(RecordingLevelSampleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 } finally {
@@ -767,6 +768,8 @@ public class MainActivity extends ActionBarActivity {
             // indicates completion
             mytxt.append("{\"lightId\":32,\"red\":255,\"green\":0,\"blue\":0,\"intensity\":0.95}");
             mytxt.append("],\"propagate\": true}");
+            // TODO: send JSON to string file
+            // TODO: delete amplitude.txt
             json2 = mytxt.toString();
         } catch (Exception e) {
             // if any I/O error occurs
