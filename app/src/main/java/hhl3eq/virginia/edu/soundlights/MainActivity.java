@@ -459,13 +459,13 @@ public class MainActivity extends ActionBarActivity {
             case R.id.action_settings:
                 if (isCollapsedSettingsMenu) {
                     Tools.expand(settingsMenuView);
-                    if (isLoggedIn) {
-                        Tools.expand(lytFiles);
-                    }
+//                    if (isLoggedIn) {
+//                        Tools.expand(lytFiles);
+//                    }
                     isCollapsedSettingsMenu = false;
                 } else {
                     Tools.collapse(settingsMenuView);
-                    Tools.collapse(lytFiles);
+//                    Tools.collapse(lytFiles);
                     isCollapsedSettingsMenu = true;
                 }
 
@@ -685,7 +685,7 @@ public class MainActivity extends ActionBarActivity {
                                 maxIntensity = amplitude;
                             }
                             // TODO: delete after test
-                            arrDbl.add(amplitude);
+//                            arrDbl.add(amplitude);
                         }
                     }
                 } catch (IOException e) {

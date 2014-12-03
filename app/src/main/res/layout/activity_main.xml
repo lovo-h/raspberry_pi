@@ -14,7 +14,7 @@
         android:gravity="top"
         android:focusableInTouchMode="false"
         android:layout_marginRight="10dp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_gravity="right|center_vertical" >
 
         <LinearLayout
@@ -352,7 +352,7 @@
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:id="@+id/lytFiles"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_alignParentTop="false"
         android:layout_alignParentEnd="false"
         android:background="@drawable/custom_bg3"
