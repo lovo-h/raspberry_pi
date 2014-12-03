@@ -1,0 +1,419 @@
+<RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/settingsMenu"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:gravity="top"
+        android:focusableInTouchMode="false"
+        android:layout_marginRight="10dp"
+        android:visibility="visible"
+        android:layout_gravity="right|center_vertical" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:baselineAligned="false"
+            android:textAlignment="center"
+            android:background="@drawable/custom_bg"
+            android:layout_gravity="right|center_vertical"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/lblIPText"
+                android:id="@+id/textView4"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="20dp"
+                android:textStyle="bold"
+                android:layout_marginRight="20dp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp" >
+
+                <EditText
+                    android:layout_width="250dp"
+                    android:layout_height="40dp"
+                    android:id="@+id/txtInputIP"
+                    android:textColor="#ff1111cc"
+                    android:textStyle="bold"
+                    android:enabled="true"
+                    android:text="@string/txtInputIP"
+                    android:typeface="sans"
+                    android:background="@drawable/custom_bg"
+                    android:paddingLeft="30dp"
+                    android:paddingRight="20dp"
+                    android:inputType="textUri" />
+
+                <TextView
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:id="@+id/saveIP"
+                    android:background="@drawable/ic_action_save"
+                    android:backgroundTint="#ff000000"
+                    android:onClick="addIP"
+                    android:layout_marginLeft="@dimen/IPIcon_left_offset" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="1"
+                android:id="@+id/firstRow"
+                android:layout_marginLeft="@dimen/ip_left_offset"
+                android:layout_marginTop="@dimen/ip_top_offset" >
+
+                <TextView
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="172.26.55.177"
+                    android:id="@+id/firstIPDisplay"
+                    android:layout_weight="0.31"
+                    android:textStyle="italic" />
+
+                <TextView
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:id="@+id/firstEdit"
+                    android:background="@drawable/ic_action_edit"
+                    android:onClick="editIP"
+                    android:layout_marginLeft="@dimen/IPIcon_left_offset" />
+
+                <TextView
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:id="@+id/firstX"
+                    android:background="@drawable/ic_action_remove"
+                    android:onClick="removeIP"
+                    android:enabled="true"
+                    android:layout_marginLeft="@dimen/IPIcon_left_offset" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="1"
+                android:id="@+id/secondRow"
+                android:layout_marginLeft="@dimen/ip_left_offset"
+                android:layout_marginTop="@dimen/ip_top_offset" >
+
+                <TextView
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="172.26.166.135"
+                    android:id="@+id/secondIPDisplay"
+                    android:layout_weight="0.31"
+                    android:textStyle="italic" />
+
+                <TextView
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:id="@+id/secondEdit"
+                    android:background="@drawable/ic_action_edit"
+                    android:onClick="editIP"
+                    android:layout_marginLeft="@dimen/IPIcon_left_offset" />
+
+                <TextView
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:id="@+id/secondX"
+                    android:background="@drawable/ic_action_remove"
+                    android:onClick="removeIP"
+                    android:enabled="true"
+                    android:layout_marginLeft="@dimen/IPIcon_left_offset" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="1"
+                android:id="@+id/thirdRow"
+                android:layout_marginLeft="@dimen/ip_left_offset"
+                android:layout_marginTop="@dimen/ip_top_offset" >
+
+                <TextView
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="172.26.166.135"
+                    android:id="@+id/thirdIPDisplay"
+                    android:layout_weight="0.31"
+                    android:textStyle="italic" />
+
+                <TextView
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:id="@+id/thirdEdit"
+                    android:background="@drawable/ic_action_edit"
+                    android:onClick="editIP"
+                    android:layout_marginLeft="@dimen/IPIcon_left_offset" />
+
+                <TextView
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:id="@+id/thirdX"
+                    android:background="@drawable/ic_action_remove"
+                    android:onClick="removeIP"
+                    android:autoText="false"
+                    android:enabled="true"
+                    android:layout_marginLeft="@dimen/IPIcon_left_offset" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/relativeLayout"
+        android:background="@drawable/main_custom_bg"
+        android:layout_gravity="left|center_vertical"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentStart="false"
+        android:layout_toLeftOf="@+id/settingsMenu"
+        android:layout_toRightOf="@+id/lytFiles">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/linearLayout3"
+            android:layout_marginTop="20dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" >
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lblColorOptions"
+                    android:id="@+id/textView3"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+
+                <RadioGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:id="@+id/rdGroup"
+                    android:layout_gravity="center_horizontal" >
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/rbtnOne"
+                        android:id="@+id/radioButton"
+                        android:checked="true" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/rbtnTwo"
+                        android:id="@+id/radioButton2" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/rbtnThree"
+                        android:id="@+id/radioButton3" />
+                </RadioGroup>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linearLayout3"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:id="@+id/linearLayout" >
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent" >
+
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/chkIP"
+                    android:id="@+id/chkIP"
+                    android:checked="true" />
+
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/chkUVA"
+                    android:id="@+id/chkUVA" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lblIPReceivers"
+                android:id="@+id/lblIPHost"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/btnSend"
+                android:id="@+id/btnSend"
+                android:layout_gravity="center_horizontal"
+                android:onClick="startSend"
+                android:textColor="#ff1111cc"
+                android:background="@drawable/custom_button"
+                android:layout_marginTop="50dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/linearLayout2"
+            android:layout_below="@+id/upload"
+            android:layout_centerHorizontal="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/lblRecordingFeedback"
+                android:id="@+id/lblRecorderFeedback"
+                android:layout_alignBottom="@+id/progressBar"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="20dp"
+                android:layout_gravity="center_horizontal" />
+
+
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/progressBar"
+                android:layout_gravity="center"
+                android:layout_below="@+id/linearLayout"
+                android:layout_centerHorizontal="true" />
+
+        </LinearLayout>
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/upload"
+            android:id="@+id/upload"
+            android:onClick="upload"
+            android:layout_below="@+id/linearLayout"
+            android:layout_centerHorizontal="true" />
+
+        android:scrollbars="vertical"
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:id="@+id/lytFiles"
+        android:visibility="gone"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentEnd="false"
+        android:background="@drawable/custom_bg3"
+        android:layout_alignParentStart="true">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:id="@+id/filesMenu"
+            android:layout_marginTop="@dimen/filesTopView"
+            android:layout_marginLeft="@dimen/filesTopView">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="@string/txtFilesHeader"
+                    android:id="@+id/txtFilesHeader"
+                    android:textStyle="bold" />
+
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="199dp"
+                    android:id="@+id/listView"
+                    android:layout_toStartOf="@+id/upload"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignBottom="@+id/linearLayout"
+                    android:choiceMode="singleChoice"
+                    android:listSelector="@android:drawable/screen_background_light_transparent"
+                    android:layout_weight="0.44" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Files in Dropbox"
+                    android:textStyle="bold"
+                    android:id="@+id/textView" />
+
+                <GridView
+<<<<<<< HEAD
+                    android:layout_width="150dp"
+                    android:layout_height="269dp"
+                    android:id="@+id/grdFiles"/>
+=======
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/grdFiles" />
+>>>>>>> 340be03765576bcc10df7091778b999d46044197
+
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+</RelativeLayout>
