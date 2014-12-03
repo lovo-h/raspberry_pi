@@ -26,7 +26,7 @@ public class UploadFile extends AsyncTask<Void, Void, Boolean> {
     protected Boolean doInBackground(Void... params) {
         try {
             FileInputStream fileInputStream = new FileInputStream(file);
-            dropbox.putFile("/values.wav", fileInputStream, file.length(), null, null);
+            dropbox.putFile(file.getName(), fileInputStream, file.length(), null, null);
             return true;
         } catch (IOException e) {
             e.printStackTrace();

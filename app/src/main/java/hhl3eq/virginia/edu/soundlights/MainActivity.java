@@ -150,34 +150,20 @@ public class MainActivity extends ActionBarActivity {
         FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File dir, String filename) {
                 String lowerName = filename.toLowerCase();
-                if (lowerName.endsWith(".wav")) {
-                    System.out.println("aaaaaaa");
-                    System.out.println("aaaaaaa");
-                    System.out.println("aaaaaaa");
+                if (lowerName.endsWith(".wav"))
                     return true;
-                }
-                else {
-                    System.out.println("bbbbb");
-                    System.out.println("bbbbb");
-                    System.out.println("bbbbb");
+                else
                     return false;
-                }
             }
         };
-        int i=0;
-        for (File c : f.listFiles()){
-            if (c.isFile() && c.getName().endsWith(".wav")) {
-                wavFiles[i] = c;
-                i++;
-            }
-        }
-        //wavFiles = f.listFiles(filter);
+
+        wavFiles = f.listFiles(filter);
         //listLocalFiles(wavFiles);
         String[] wfNames = new String[wavFiles.length];
-        int j=0;
+        int i=0;
         for (File a : wavFiles){
             wfNames[i] = a.getName().toString();
-            j++;
+            i++;
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, wfNames){
@@ -190,6 +176,7 @@ public class MainActivity extends ActionBarActivity {
             }
         };
 
+        listOfFiles = (ListView) findViewById(R.id.listView);
         listOfFiles.setAdapter(adapter);
         listOfFiles.setVisibility(View.VISIBLE);
         listOfFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
