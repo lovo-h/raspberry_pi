@@ -376,20 +376,37 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void startSend(View view) {
-        try {
-            Toast.makeText(getBaseContext(), "Please wait. Now converting...", Toast.LENGTH_SHORT).show();
-            //TODO: delete after test
-            rawToDbl(file2);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-
         boolean chkip = chkIP.isChecked();
         boolean chkuva = chkUVA.isChecked();
 //        json = Tools.prepareJSON(rdgrpChoice);
-        json = json2;
+//        json = json2;
 
         if (chkip) {
+
+            try {
+
+                InputStream is = new FileInputStream(jsonfile.getAbsolutePath());;
+
+                int size = is.available();
+
+                byte[] buffer = new byte[size];
+
+                is.read(buffer);
+
+                is.close();
+
+                json = new String(buffer, "UTF-8");
+
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+
+
+
+
+
             String ip = txtInputIP.getText().toString();
             Toast.makeText(getBaseContext(), "Sending data to IP address: " + ip, Toast.LENGTH_LONG).show();
             new HttpAsyncTask(json).execute(ip + "/rpi");
@@ -600,15 +617,15 @@ public class MainActivity extends ActionBarActivity {
                     String fName = fn.getText().toString();
                     //Toast.makeText(getBaseContext(), fName, Toast.LENGTH_LONG).show();
                     if (fName.length() > 0) {
-                        fName += ".wav";
-                        File newName = new File(Environment.getExternalStorageDirectory(), fName);
-                        Toast.makeText(getBaseContext(), "File saved as " + fName, Toast.LENGTH_LONG).show();
+                        File newName = new File(Environment.getExternalStorageDirectory(), fName + ".wav");
                         waveFile.renameTo(newName);
-                        listLocalFiles();
+                        File newJSONName = new File(Environment.getExternalStorageDirectory(), fName + ".txt");
+                        jsonfile.renameTo(newJSONName);
+                        Toast.makeText(getBaseContext(), "File saved as " + fName, Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(getBaseContext(), "File saved as values.wav", Toast.LENGTH_LONG).show();
-                        listLocalFiles();
                     }
+                    listLocalFiles();
                     popupWindow.dismiss();
                 }
             });
@@ -661,20 +678,7 @@ public class MainActivity extends ActionBarActivity {
         maxIntensity = 0;
     }
 
-    private void startReadingBar() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (isRecording) {
-                        lblRecorderFeedback.setText(Integer.toString(mProgressBar.getProgress()));
-                    }
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-        }).start();
-    }
+
 
     // TODO: Delete after testing
     ArrayList<Double> arrDbl = new ArrayList<Double>();
@@ -710,6 +714,16 @@ public class MainActivity extends ActionBarActivity {
 
                         }
                     }
+
+
+                    try {
+//                        Toast.makeText(getBaseContext(), "Please wait. Now converting...", Toast.LENGTH_SHORT).show();
+                        rawToDbl(file2);
+                    } catch (IOException e) {
+                        System.out.println(e.getMessage());
+                    }
+
+
                 } catch (IOException e) {
                     //Toast.makeText(RecordingLevelSampleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 } finally {
@@ -734,6 +748,8 @@ public class MainActivity extends ActionBarActivity {
         }).start();
     }
 
+    //TODO: move this to the top
+    File jsonfile;
     private void rawToDbl(File rawFile) throws IOException {
 //        byte[] rawData = new byte[(int) rawFile.length()];
         DataInputStream input = null;
@@ -767,6 +783,15 @@ public class MainActivity extends ActionBarActivity {
             // indicates completion
             mytxt.append("{\"lightId\":32,\"red\":255,\"green\":0,\"blue\":0,\"intensity\":0.95}");
             mytxt.append("],\"propagate\": true}");
+
+
+            jsonfile = new File(Environment.getExternalStorageDirectory(), "json.txt");
+            FileWriter fw = new FileWriter(jsonfile.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(mytxt.toString());
+            bw.flush();
+            bw.close();
+
             json2 = mytxt.toString();
         } catch (Exception e) {
             // if any I/O error occurs
@@ -1022,4 +1047,22 @@ public class MainActivity extends ActionBarActivity {
             });
         }
     };
+
+
+
+
+    private void startReadingBar() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while (isRecording) {
+                        lblRecorderFeedback.setText(Integer.toString(mProgressBar.getProgress()));
+                    }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }).start();
+    }
 }
