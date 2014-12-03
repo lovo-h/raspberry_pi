@@ -5,8 +5,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.exception.DropboxException;
 
+@TargetApi(Build.VERSION_CODES.CUPCAKE)
 public class DisplayFiles extends AsyncTask<Void, Void, ArrayList<String>>  {
     private DropboxAPI<?> dropbox;
     private Handler handler;
