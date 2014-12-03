@@ -46,7 +46,7 @@ public class DownloadFile extends AsyncTask<Void, Void, Boolean> {
             Toast.makeText(context, "File Downloaded Successfully!",
                     Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(context, "Failed to download file", Toast.LENGTH_LONG)
+            Toast.makeText(context, "Failed to download file. Check if logged in.", Toast.LENGTH_LONG)
                     .show();
         }
     }
