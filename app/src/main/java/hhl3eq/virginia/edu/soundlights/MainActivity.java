@@ -540,12 +540,8 @@ public class MainActivity extends ActionBarActivity {
                 }
             });
 
-            Display mdisp = getWindowManager().getDefaultDisplay();
-            int maxX = mdisp.getWidth();
-            int maxY = mdisp.getHeight();
-            Button btn = (Button) findViewById(R.id.btnSend);
             TextView align = (TextView) findViewById(R.id.textView3);
-            popupWindow.showAsDropDown(btn, maxX-100 , 0);
+            popupWindow.showAsDropDown(align, 0 , 0);
             // TODO: delete after test
 //            displayAmplitude();
         }
