@@ -51,6 +51,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -84,6 +85,7 @@ public class MainActivity extends ActionBarActivity {
     private ProgressBar mProgressBar;
     private File file = new File(Environment.getExternalStorageDirectory(), "values.raw");
     private File waveFile = new File(Environment.getExternalStorageDirectory(), "values.wav");
+    private File file2 = new File(Environment.getExternalStorageDirectory(), "amplitude.txt");
     private File targetFile;
     public int bufferSize = 0;
     private boolean isPlaying = false;
@@ -178,55 +180,59 @@ public class MainActivity extends ActionBarActivity {
         //login.setText(isLogged ? "Logout" : "Login");
     }
 
+    private void loadIPsFromTXT() {
+        String[] strIPs = new String[3];
+        // reset empty rows
+        for (int x = 0; x < 3; x++) {
+            currentEmptyRows[x] = true;
+        }
+
+        //Get the text file
+        File file = new File(Environment.getExternalStorageDirectory(), "IPs.txt");
+
+        int ipCount = 0;
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+
+            while ((line = br.readLine()) != null && ipCount < 3) {
+                strIPs[ipCount] = line;
+                currentEmptyRows[ipCount++] = false;
+            }
+        } catch (IOException e) {
+            //You'll need to add proper error handling here
+        }
+
+        EditText txtIP = (EditText) findViewById(R.id.txtInputIP);
+        txtIP.setText(strIPs[0]);
+        TextView saveTxt = (TextView) findViewById(R.id.firstIPDisplay);
+        saveTxt.setText(strIPs[0]);
+        saveTxt = (TextView) findViewById(R.id.secondIPDisplay);
+        saveTxt.setText(strIPs[1]);
+        saveTxt = (TextView) findViewById(R.id.thirdIPDisplay);
+        saveTxt.setText(strIPs[2]);
+
+        View someRow;
+        if (currentEmptyRows[0]) {
+            someRow = findViewById(R.id.firstRow);
+            someRow.setVisibility(View.GONE);
+        }
+        if (currentEmptyRows[1]) {
+            someRow = findViewById(R.id.secondRow);
+            someRow.setVisibility(View.GONE);
+        }
+        if (currentEmptyRows[2]) {
+            someRow = findViewById(R.id.thirdRow);
+            someRow.setVisibility(View.GONE);
+        }
+    }
+
     private class SetupViewsOnLoadHelper extends AsyncTask<View, Void, String> {
         /* used to initialize the program in the background */
         @Override
         protected String doInBackground(View... views) {
-            String[] strIPs = new String[3];
-            // reset empty rows
-            for (int x = 0; x < 3; x++) {
-                currentEmptyRows[x] = true;
-            }
-
-            //Get the text file
-            File file = new File(Environment.getExternalStorageDirectory(), "IPs.txt");
-
-            int ipCount = 0;
-
-            try {
-                BufferedReader br = new BufferedReader(new FileReader(file));
-                String line;
-
-                while ((line = br.readLine()) != null && ipCount < 3) {
-                    strIPs[ipCount] = line;
-                    currentEmptyRows[ipCount++] = false;
-                }
-            } catch (IOException e) {
-                //You'll need to add proper error handling here
-            }
-
-            EditText txtIP = (EditText) findViewById(R.id.txtInputIP);
-            txtIP.setText(strIPs[0]);
-            TextView saveTxt = (TextView) findViewById(R.id.firstIPDisplay);
-            saveTxt.setText(strIPs[0]);
-            saveTxt = (TextView) findViewById(R.id.secondIPDisplay);
-            saveTxt.setText(strIPs[1]);
-            saveTxt = (TextView) findViewById(R.id.thirdIPDisplay);
-            saveTxt.setText(strIPs[2]);
-
-            View someRow;
-            if (currentEmptyRows[0]) {
-                someRow = findViewById(R.id.firstRow);
-                someRow.setVisibility(View.GONE);
-            }
-            if (currentEmptyRows[1]) {
-                someRow = findViewById(R.id.secondRow);
-                someRow.setVisibility(View.GONE);
-            }
-            if (currentEmptyRows[2]) {
-                someRow = findViewById(R.id.thirdRow);
-                someRow.setVisibility(View.GONE);
-            }
+            loadIPsFromTXT();
 
             lblRecorderFeedback = (TextView) findViewById(R.id.lblRecorderFeedback);
             txtInputIP = (EditText) findViewById(R.id.txtInputIP);
@@ -316,6 +322,14 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void startSend(View view) {
+        try {
+            Toast.makeText(getBaseContext(), "Please wait. Now converting...", Toast.LENGTH_SHORT).show();
+            //TODO: delete after test
+            rawToDbl(file2);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
         boolean chkip = chkIP.isChecked();
         boolean chkuva = chkUVA.isChecked();
 //        json = Tools.prepareJSON(rdgrpChoice);
@@ -504,7 +518,8 @@ public class MainActivity extends ActionBarActivity {
             isRecording = false;
             // TODO: delete after test
 
-            displayAmplitude();
+//            displayAmplitude();
+
         }
 
         try {
@@ -570,8 +585,13 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void run() {
                 DataOutputStream output = null;
+                DataOutputStream output2 = null;
+                File file2 = new File(Environment.getExternalStorageDirectory(), "amplitude.txt");
+                String[] strDbl = new String[1];
                 try {
+                    output2 = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file2)));
                     output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+
                     while (isRecording) {
                         double sum = 0;
                         int readSize = mRecorder.read(mBuffer, 0, mBuffer.length);
@@ -586,7 +606,9 @@ public class MainActivity extends ActionBarActivity {
                                 maxIntensity = amplitude;
                             }
                             // TODO: delete after test
-                            arrDbl.add(amplitude);
+//                            arrDbl.add(amplitude);
+                            output2.writeDouble(amplitude);
+
                         }
                     }
                 } catch (IOException e) {
@@ -596,11 +618,13 @@ public class MainActivity extends ActionBarActivity {
                     if (output != null) {
                         try {
                             output.flush();
+                            output2.flush();
                         } catch (IOException e) {
                             System.out.println(e.getMessage());
                         } finally {
                             try {
                                 output.close();
+                                output2.close();
                             } catch (IOException e) {
                                 System.out.println(e.getMessage());
                             }
@@ -609,6 +633,48 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
         }).start();
+    }
+
+    private void rawToDbl(File rawFile) throws IOException {
+//        byte[] rawData = new byte[(int) rawFile.length()];
+        DataInputStream input = null;
+        maxIntensity /= 2;
+
+        InputStream is;
+        try {
+            // create file input stream
+            is = new FileInputStream(rawFile.getAbsolutePath());
+
+            // create new data input stream
+            input = new DataInputStream(is);
+
+
+            StringBuilder mytxt = new StringBuilder();
+            mytxt.append("{\"lights\": [");
+            int lightn = 0;
+            double dbl;
+
+            // read till end of the stream
+            while (input.available() > 0) {
+                // read character
+                dbl = input.readDouble();
+                // TODO: ==============================
+                mytxt.append("{\"lightId\":");
+                lightn = (int) ((dbl / maxIntensity * 32));
+
+                mytxt.append(lightn);
+                mytxt.append(",\"red\":0,\"green\":255,\"blue\":0,\"intensity\":0.75},");
+            }
+            // indicates completion
+            mytxt.append("{\"lightId\":32,\"red\":255,\"green\":0,\"blue\":0,\"intensity\":0.95}");
+            mytxt.append("],\"propagate\": true}");
+            json2 = mytxt.toString();
+        } catch (Exception e) {
+            // if any I/O error occurs
+            e.printStackTrace();
+        } finally {
+            input.close();
+        }
     }
 
     private void rawToWave(final File rawFile, final File waveFile) throws IOException {
