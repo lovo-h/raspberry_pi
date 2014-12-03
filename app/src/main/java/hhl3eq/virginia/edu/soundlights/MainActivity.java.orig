@@ -748,6 +748,11 @@ public class MainActivity extends ActionBarActivity {
             // indicates completion
             mytxt.append("{\"lightId\":32,\"red\":255,\"green\":0,\"blue\":0,\"intensity\":0.95}");
             mytxt.append("],\"propagate\": true}");
+<<<<<<< HEAD
+            // TODO: send JSON to json file
+            // TODO: delete amplitude.txt
+            json2 = mytxt.toString();
+=======
 
 
             jsonfile = new File(Environment.getExternalStorageDirectory(), "json.txt");
@@ -756,6 +761,7 @@ public class MainActivity extends ActionBarActivity {
             bw.write(mytxt.toString());
             bw.flush();
             bw.close();
+>>>>>>> 8e226b4c06bf752dca5d42a48e851c7b65316b56
         } catch (Exception e) {
             // if any I/O error occurs
             e.printStackTrace();
