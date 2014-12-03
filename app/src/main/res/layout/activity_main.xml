@@ -14,7 +14,7 @@
         android:gravity="top"
         android:focusableInTouchMode="false"
         android:layout_marginRight="10dp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_gravity="right|center_vertical" >
 
         <LinearLayout
@@ -307,7 +307,6 @@
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="66dp"
             android:id="@+id/linearLayout2"
             android:layout_below="@+id/upload"
             android:layout_centerHorizontal="true">
@@ -346,17 +345,6 @@
             android:layout_below="@+id/linearLayout"
             android:layout_centerHorizontal="true" />
 
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/display"
-            android:id="@+id/display"
-            android:onClick="displayFiles"
-            android:layout_below="@+id/upload"
-            android:layout_alignLeft="@+id/linearLayout"
-            android:layout_alignStart="@+id/linearLayout" />
-
         android:scrollbars="vertical"
     </RelativeLayout>
 
@@ -364,7 +352,7 @@
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:id="@+id/lytFiles"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_alignParentTop="false"
         android:layout_alignParentEnd="false"
         android:background="@drawable/custom_bg3"
@@ -381,7 +369,8 @@
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
+                android:layout_height="fill_parent"
+                android:weightSum="1">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -391,10 +380,31 @@
                     android:id="@+id/txtFilesHeader"
                     android:textStyle="bold" />
 
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="199dp"
+                    android:id="@+id/listView"
+                    android:layout_toStartOf="@+id/upload"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignBottom="@+id/linearLayout"
+                    android:choiceMode="singleChoice"
+                    android:listSelector="@android:drawable/screen_background_light_transparent"
+                    android:layout_weight="0.44" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Files in Dropbox"
+                    android:textStyle="bold"
+                    android:id="@+id/textView" />
+
                 <GridView
                     android:layout_width="200dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/grdFiles" />
+                    android:layout_height="269dp"
+                    android:id="@+id/grdFiles"/>
 
             </LinearLayout>
         </LinearLayout>

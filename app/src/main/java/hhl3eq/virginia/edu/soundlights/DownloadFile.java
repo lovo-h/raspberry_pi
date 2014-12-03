@@ -18,8 +18,7 @@ public class DownloadFile extends AsyncTask<Void, Void, Boolean> {
     private File file;
     private File localFile;
 
-    public DownloadFile(Context context, DropboxAPI<?> dropbox,
-                      File file) {
+    public DownloadFile(Context context, DropboxAPI<?> dropbox, File file) {
         this.context = context.getApplicationContext();
         this.dropbox = dropbox;
         this.file = file;
@@ -43,11 +42,9 @@ public class DownloadFile extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean result) {
         if (result) {
-            Toast.makeText(context, "File Downloaded Successfully!",
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "File Downloaded Successfully!",Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(context, "Failed to download file", Toast.LENGTH_LONG)
-                    .show();
+            Toast.makeText(context, "Failed to download file. Check if logged in.", Toast.LENGTH_LONG).show();
         }
     }
 }

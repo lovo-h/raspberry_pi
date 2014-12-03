@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
@@ -16,10 +17,13 @@ import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -27,6 +31,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -48,6 +54,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -109,9 +116,14 @@ public class MainActivity extends ActionBarActivity {
     private boolean isLoggedIn;
     private Button login;
     private Button uploadBtn;
-    private Button displayBtn;
     private GridView gridFiles;
+    private ListView listOfFiles;
     String[] fnames = null;
+    File[] wavFiles;
+    //private Button btnOpenPopup;
+    private EditText fn;
+    private Menu menu;
+    private File selectedFile;
 
     // TODO: remove after test
 //    private final Semaphore inB = new Semaphore(1);
@@ -123,7 +135,6 @@ public class MainActivity extends ActionBarActivity {
         new SetupViewsOnLoadHelper().execute(); // loads things in the background
 
         uploadBtn = (Button) findViewById(R.id.upload);
-        displayBtn = (Button) findViewById(R.id.display);
 
         loggedIn(false);
 
@@ -142,6 +153,7 @@ public class MainActivity extends ActionBarActivity {
         }
 
         dropbox = new DropboxAPI<AndroidAuthSession>(session);
+        listLocalFiles();
     }
 
     @Override
@@ -168,14 +180,56 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    public void listLocalFiles(){
+        File f = new File(Environment.getExternalStorageDirectory().toString());
+        FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File dir, String filename) {
+                String lowerName = filename.toLowerCase();
+                if (lowerName.endsWith(".wav"))
+                    return true;
+                else
+                    return false;
+            }
+        };
+
+        wavFiles = f.listFiles(filter);
+
+        String[] wfNames = new String[wavFiles.length];
+        int i=0;
+        for (File a : wavFiles){
+            wfNames[i] = a.getName().toString();
+            i++;
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, wfNames){
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView text = (TextView) view.findViewById(android.R.id.text1);
+                text.setTextColor(Color.RED);
+                return view;
+            }
+        };
+
+        listOfFiles = (ListView) findViewById(R.id.listView);
+        listOfFiles.setAdapter(adapter);
+        listOfFiles.setVisibility(View.VISIBLE);
+        listOfFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, final View view,int position, long id) {
+                selectedFile = wavFiles[position];
+            }
+        });
+    }
+
     public void loggedIn(boolean isLogged) {
         isLoggedIn = isLogged;
         if (isLogged) {
             uploadBtn.setVisibility(View.VISIBLE);
-            displayBtn.setVisibility(View.VISIBLE);
+            DisplayFiles display = new DisplayFiles(dropbox, handler);
+            display.execute();
         } else {
             uploadBtn.setVisibility(View.GONE);
-            displayBtn.setVisibility(View.GONE);
         }
         //login.setText(isLogged ? "Logout" : "Login");
     }
@@ -407,6 +461,7 @@ public class MainActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        this.menu = menu;
         return true;
     }
 
@@ -418,13 +473,13 @@ public class MainActivity extends ActionBarActivity {
             case R.id.action_settings:
                 if (isCollapsedSettingsMenu) {
                     Tools.expand(settingsMenuView);
-                    if (isLoggedIn) {
-                        Tools.expand(lytFiles);
-                    }
+//                    if (isLoggedIn) {
+//                        Tools.expand(lytFiles);
+//                    }
                     isCollapsedSettingsMenu = false;
                 } else {
                     Tools.collapse(settingsMenuView);
-                    Tools.collapse(lytFiles);
+//                    Tools.collapse(lytFiles);
                     isCollapsedSettingsMenu = true;
                 }
 
@@ -437,7 +492,7 @@ public class MainActivity extends ActionBarActivity {
                 break;
             case R.id.action_play:
                 startPlayingRecord(getWindow().getDecorView().findViewById(android.R.id.content));
-                toggleIcon(item, isPlaying, R.drawable.pause1, R.drawable.play1);
+                //toggleIcon(item, isPlaying, R.drawable.pause1, R.drawable.play1);
                 break;
             case R.id.action_dropbox:
                 if (isLoggedIn) {
@@ -484,24 +539,32 @@ public class MainActivity extends ActionBarActivity {
 
     public void startPlayingRecord(View view) {
         if (!isPlaying) {
-            oPlayer = new MediaPlayer();
-            try {
-                lblRecorderFeedback.setText("Playing Back (looped)...");
-                oPlayer.setDataSource(waveFile.getAbsolutePath());
-                oPlayer.prepare();
-                oPlayer.start();
-
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
+            if (selectedFile != null) {
+                oPlayer = new MediaPlayer();
+                try {
+                    lblRecorderFeedback.setText("Playing Back (looped)...");
+                    oPlayer.setDataSource(selectedFile.getAbsolutePath());
+                    oPlayer.prepare();
+                    oPlayer.start();
+                    //
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
+                }
+                isPlaying = true;
+                oPlayer.setLooping(true);
+                //listFiles.setVisibility(View.GONE);
+                menu.getItem(1).setIcon(getResources().getDrawable(R.drawable.pause1));
             }
-            isPlaying = true;
-            oPlayer.setLooping(true);
+            else
+                Toast.makeText(getBaseContext(), "Select File First!", Toast.LENGTH_LONG).show();
+
         } else {
             lblRecorderFeedback.setText("...");
             oPlayer.stop();
             oPlayer.release();
             oPlayer = null;
             isPlaying = false;
+            menu.getItem(1).setIcon(getResources().getDrawable(R.drawable.play1));
         }
     }
 
@@ -516,6 +579,42 @@ public class MainActivity extends ActionBarActivity {
             lblRecorderFeedback.setText("...");
             mRecorder.stop();
             isRecording = false;
+
+            LayoutInflater layoutInflater
+                    = (LayoutInflater)getBaseContext()
+                    .getSystemService(LAYOUT_INFLATER_SERVICE);
+            View popupView = layoutInflater.inflate(R.layout.file_name_popup, null);
+            final PopupWindow popupWindow = new PopupWindow(
+                    popupView,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+
+            Button btnSave = (Button)popupView.findViewById(R.id.save);
+            popupWindow.setFocusable(true);
+            //popupWindow.update();
+            fn = (EditText) popupView.findViewById(R.id.fineName);
+
+            btnSave.setOnClickListener(new Button.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String fName = fn.getText().toString();
+                    //Toast.makeText(getBaseContext(), fName, Toast.LENGTH_LONG).show();
+                    if (fName.length() > 0) {
+                        fName += ".wav";
+                        File newName = new File(Environment.getExternalStorageDirectory(), fName);
+                        Toast.makeText(getBaseContext(), "File saved as " + fName, Toast.LENGTH_LONG).show();
+                        waveFile.renameTo(newName);
+                        listLocalFiles();
+                    } else {
+                        Toast.makeText(getBaseContext(), "File saved as values.wav", Toast.LENGTH_LONG).show();
+                        listLocalFiles();
+                    }
+                    popupWindow.dismiss();
+                }
+            });
+
+            TextView align = (TextView) findViewById(R.id.textView3);
+            popupWindow.showAsDropDown(align, 0 , 0);
             // TODO: delete after test
 
 //            displayAmplitude();
@@ -880,8 +979,14 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void upload(View view) {
-        UploadFile upload = new UploadFile(this, dropbox, waveFile);
-        upload.execute();
+        if (selectedFile != null) {
+            UploadFile upload = new UploadFile(this, dropbox, selectedFile);
+            upload.execute();
+            DisplayFiles display = new DisplayFiles(dropbox, handler);
+            display.execute();
+        }
+        else
+            Toast.makeText(getBaseContext(), "Select File First!", Toast.LENGTH_LONG).show();
     }
 
     public void download(View view) {
@@ -889,31 +994,32 @@ public class MainActivity extends ActionBarActivity {
         download.execute();
     }
 
-    private final Handler handler = new Handler() {
+    public Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             ArrayList<String> result = msg.getData().getStringArrayList("data");
             fnames = result.toArray(new String[result.size()]);
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, fnames);
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, fnames){
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+                    View view = super.getView(position, convertView, parent);
+                    TextView text = (TextView) view.findViewById(android.R.id.text1);
+                    text.setTextColor(Color.CYAN);
+                    return view;
+                }
+            };
 
             gridFiles = (GridView) findViewById(R.id.grdFiles);
             gridFiles.setAdapter(adapter);
-
             gridFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     targetFile = new File(Environment.getExternalStorageDirectory(), fnames[position]);
                     DownloadFile download = new DownloadFile(getApplicationContext(), dropbox, targetFile);
                     download.execute();
+                    listLocalFiles();
                 }
             });
-
-
         }
     };
-
-    public void displayFiles(View view) {
-        DisplayFiles display = new DisplayFiles(dropbox, handler);
-        display.execute();
-    }
 }

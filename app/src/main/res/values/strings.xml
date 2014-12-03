@@ -23,5 +23,6 @@
     <string name="upload">Upload the Recorded File</string>
     <string name="stop">Stop</string>
     <string name="display">Display List of Files</string>
+    <string name="save">Save As: (default-values.wav)</string>
 
 </resources>
