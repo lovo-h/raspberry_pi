@@ -1,24 +1,19 @@
 package hhl3eq.virginia.edu.soundlights;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.AsyncTask;
-import android.os.DropBoxManager;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,7 +38,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -52,7 +46,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.FileReader;
@@ -65,8 +58,6 @@ import java.util.ArrayList;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.exception.DropboxException;
-import com.dropbox.client2.exception.DropboxUnlinkedException;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session.AccessType;
@@ -77,9 +68,6 @@ import com.dropbox.client2.session.TokenPair;
 public class MainActivity extends ActionBarActivity {
     private EditText txtInputIP;
     private String json;
-    private String json2;
-    private CheckBox chkIP;
-    private CheckBox chkUVA;
 
     private int rdgrpChoice = 0;      // initial selection
 
@@ -90,7 +78,7 @@ public class MainActivity extends ActionBarActivity {
 
     private short[] mBuffer;
     private ProgressBar mProgressBar;
-    private File file = new File(Environment.getExternalStorageDirectory(), "values.raw");
+    private File fileValuesRaw = new File(Environment.getExternalStorageDirectory(), "values.raw");
     private File waveFile = new File(Environment.getExternalStorageDirectory(), "values.wav");
     private File file2 = new File(Environment.getExternalStorageDirectory(), "amplitude.txt");
     private File targetFile;
@@ -181,6 +169,9 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    String[] wfNames;
+
+    // TODO: also working on...
     public void listLocalFiles() {
         File f = new File(Environment.getExternalStorageDirectory().toString());
         FilenameFilter filter = new FilenameFilter() {
@@ -195,7 +186,7 @@ public class MainActivity extends ActionBarActivity {
 
         wavFiles = f.listFiles(filter);
 
-        String[] wfNames = new String[wavFiles.length];
+        wfNames = new String[wavFiles.length];
         int i = 0;
         for (File a : wavFiles) {
             wfNames[i] = a.getName().toString();
@@ -207,7 +198,7 @@ public class MainActivity extends ActionBarActivity {
             public View getView(int position, View convertView, ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
                 TextView text = (TextView) view.findViewById(android.R.id.text1);
-                text.setTextColor(Color.RED);
+                text.setTextColor(Color.rgb(22, 19, 72));
                 return view;
             }
         };
@@ -218,7 +209,13 @@ public class MainActivity extends ActionBarActivity {
         listOfFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+                for (int j = 0; j < parent.getChildCount(); j++)
+                    parent.getChildAt(j).setBackgroundColor(Color.TRANSPARENT);
+
+                // change the background color of the selected element
+                view.setBackgroundColor(Color.argb(100,227,228,228));
                 selectedFile = wavFiles[position];
+                jsonfile = new File(Environment.getExternalStorageDirectory(), selectedFile.getName().toString().replace("wav", "txt"));
             }
         });
     }
@@ -242,7 +239,7 @@ public class MainActivity extends ActionBarActivity {
             currentEmptyRows[x] = true;
         }
 
-        //Get the text file
+        //Get the text
         File file = new File(Environment.getExternalStorageDirectory(), "IPs.txt");
 
         int ipCount = 0;
@@ -291,8 +288,6 @@ public class MainActivity extends ActionBarActivity {
 
             lblRecorderFeedback = (TextView) findViewById(R.id.lblRecorderFeedback);
             txtInputIP = (EditText) findViewById(R.id.txtInputIP);
-            chkIP = (CheckBox) findViewById(R.id.chkIP);
-            chkUVA = (CheckBox) findViewById(R.id.chkUVA);
             settingsMenuView = findViewById(R.id.settingsMenu);     // used to expand/collapse menu
             lytFiles = findViewById(R.id.lytFiles);                 // used to expand/collapse menu
 
@@ -377,34 +372,31 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void startSend(View view) {
-        boolean chkip = chkIP.isChecked();
-        boolean chkuva = chkUVA.isChecked();
 
-        if (chkip) {
-            try {
-                InputStream is = new FileInputStream(jsonfile.getAbsolutePath());
-                int size = is.available();
-                byte[] buffer = new byte[size];
-                is.read(buffer);
-                is.close();
-                json = new String(buffer, "UTF-8");
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+        try {
+            InputStream is = new FileInputStream(jsonfile.getAbsolutePath());
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
 
-            String ip = txtInputIP.getText().toString();
-            Toast.makeText(getBaseContext(), "Sending data to IP address: " + ip, Toast.LENGTH_LONG).show();
-            new HttpAsyncTask(json).execute(ip + "/rpi");
-        }
-        if (chkuva) {
-            // http://cs4720.cs.virginia.edu/rpi/check.php?username=au753
-            String ip = "cs4720.cs.virginia.edu/rpi/?username=au753";
-            Toast.makeText(getBaseContext(), "View results: http://cs4720.cs.virginia.edu/rpi/check.php?username=au753", Toast.LENGTH_LONG).show();
-            new HttpAsyncTask(json).execute(ip);
-        }
-        if (!chkip && !chkuva) {
-            Toast.makeText(getBaseContext(), "Please check a location", Toast.LENGTH_LONG).show();
-        }
+        String ip = txtInputIP.getText().toString();
+        Toast.makeText(getBaseContext(), "Sending data to IP address: " + ip, Toast.LENGTH_LONG).show();
+        new HttpAsyncTask(json).execute(ip + "/rpi");
+
+//        if (chkuva) {
+//            // http://cs4720.cs.virginia.edu/rpi/check.php?username=au753
+//            String ip = "cs4720.cs.virginia.edu/rpi/?username=au753";
+//            Toast.makeText(getBaseContext(), "View results: http://cs4720.cs.virginia.edu/rpi/check.php?username=au753", Toast.LENGTH_LONG).show();
+//            new HttpAsyncTask(json).execute(ip);
+//        }
+//        if (!chkip && !chkuva) {
+//            Toast.makeText(getBaseContext(), "Please check a location", Toast.LENGTH_LONG).show();
+//        }
 
     }
 
@@ -574,7 +566,7 @@ public class MainActivity extends ActionBarActivity {
         if (!isRecording) {
             lblRecorderFeedback.setText("Recording...");
             mRecorder.startRecording();
-            startBufferedWrite(file);
+            startBufferedWrite(fileValuesRaw);
             isRecording = true;
         } else {
             lblRecorderFeedback.setText("...");
@@ -599,20 +591,19 @@ public class MainActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v) {
                     String fName = fn.getText().toString();
-                    //Toast.makeText(getBaseContext(), fName, Toast.LENGTH_LONG).show();
                     if (fName.length() > 0) {
                         File newName = new File(Environment.getExternalStorageDirectory(), fName + ".wav");
                         waveFile.renameTo(newName);
-                        waveFile = newName;
+//                        waveFile = newName;
                         File newJSONName = new File(Environment.getExternalStorageDirectory(), fName + ".txt");
                         jsonfile.renameTo(newJSONName);
                         jsonfile = newJSONName;
                         Toast.makeText(getBaseContext(), "File saved as " + fName, Toast.LENGTH_LONG).show();
+                        popupWindow.dismiss();
+                        listLocalFiles();
                     } else {
-                        Toast.makeText(getBaseContext(), "File saved as values.wav", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getBaseContext(), "Enter valid name!", Toast.LENGTH_LONG).show();
                     }
-                    listLocalFiles();
-                    popupWindow.dismiss();
                 }
             });
 
@@ -620,7 +611,7 @@ public class MainActivity extends ActionBarActivity {
             popupWindow.showAsDropDown(align, 0, 0);
         }
 
-        rawToWave(file, waveFile);
+        rawToWave(fileValuesRaw, waveFile);
 
     }
 
@@ -683,7 +674,7 @@ public class MainActivity extends ActionBarActivity {
 
         InputStream is;
         try {
-            // create file input stream
+            // create fileValuesRaw input stream
             is = new FileInputStream(rawFile.getAbsolutePath());
 
             // create new data input stream
@@ -959,11 +950,6 @@ public class MainActivity extends ActionBarActivity {
             Toast.makeText(getBaseContext(), "Select File First!", Toast.LENGTH_LONG).show();
     }
 
-    public void download(View view) {
-        DownloadFile download = new DownloadFile(this, dropbox, waveFile);
-        download.execute();
-    }
-
     public Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             ArrayList<String> result = msg.getData().getStringArrayList("data");
@@ -983,8 +969,10 @@ public class MainActivity extends ActionBarActivity {
             gridFiles.setAdapter(adapter);
             gridFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
+                // TODO: working on...
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     targetFile = new File(Environment.getExternalStorageDirectory(), fnames[position]);
+                    Toast.makeText(getBaseContext(), targetFile.getAbsolutePath().toString(), Toast.LENGTH_LONG).show();
                     DownloadFile download = new DownloadFile(getApplicationContext(), dropbox, targetFile);
                     download.execute();
                     listLocalFiles();
