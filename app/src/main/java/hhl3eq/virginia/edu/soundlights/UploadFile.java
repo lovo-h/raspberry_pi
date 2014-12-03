@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
@@ -14,12 +15,13 @@ public class UploadFile extends AsyncTask<Void, Void, Boolean> {
 
     private DropboxAPI<?> dropbox;
     private Context context;
-    private File file;
+    private File file, txtFile;
 
     public UploadFile(Context context, DropboxAPI<?> dropbox, File file) {
         this.context = context.getApplicationContext();
         this.dropbox = dropbox;
         this.file = file;
+        txtFile = new File(Environment.getExternalStorageDirectory(), file.getName().replace(".wav", ".txt"));
     }
 
     @Override
@@ -27,6 +29,8 @@ public class UploadFile extends AsyncTask<Void, Void, Boolean> {
         try {
             FileInputStream fileInputStream = new FileInputStream(file);
             dropbox.putFile(file.getName(), fileInputStream, file.length(), null, null);
+            FileInputStream fileInputStream1 = new FileInputStream(txtFile);
+            dropbox.putFile(txtFile.getName(), fileInputStream1, txtFile.length(), null, null);
             return true;
         } catch (IOException e) {
             e.printStackTrace();

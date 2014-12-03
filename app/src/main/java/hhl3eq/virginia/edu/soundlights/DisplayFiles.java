@@ -32,7 +32,8 @@ public class DisplayFiles extends AsyncTask<Void, Void, ArrayList<String>>  {
             DropboxAPI.Entry dirent = dropbox.metadata("/", 1000, null, true, null);
 
             for ( DropboxAPI.Entry ent: dirent.contents){
-                dir.add(ent.fileName());
+                if (ent.fileName().endsWith(".wav"))
+                    dir.add(ent.fileName());
             }
             } catch (DropboxException e) {
                 e.printStackTrace();

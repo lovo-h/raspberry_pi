@@ -1,6 +1,7 @@
 package hhl3eq.virginia.edu.soundlights;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import android.content.Context;
@@ -15,21 +16,22 @@ public class DownloadFile extends AsyncTask<Void, Void, Boolean> {
 
     private DropboxAPI<?> dropbox;
     private Context context;
-    private File file;
-    private File localFile;
+    private File file, txtFile;
 
     public DownloadFile(Context context, DropboxAPI<?> dropbox, File file) {
         this.context = context.getApplicationContext();
         this.dropbox = dropbox;
         this.file = file;
-        localFile = new File(Environment.getExternalStorageDirectory(), file.getName());
+        txtFile = new File(Environment.getExternalStorageDirectory(), file.getName().replace(".wav", ".txt"));
     }
 
     @Override
     protected Boolean doInBackground(Void... params) {
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(localFile);
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
             dropbox.getFile("/" + file.getName(), null, fileOutputStream, null);
+            FileOutputStream fileOutputStream1 = new FileOutputStream(txtFile);
+            dropbox.getFile("/" + txtFile.getName(), null, fileOutputStream1, null);
             return true;
         } catch (IOException e) {
             e.printStackTrace();
