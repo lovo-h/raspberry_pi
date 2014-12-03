@@ -15,7 +15,7 @@
     <string name="btnSend">Send</string>
     <string name="lblColorOptions">Select a color pattern</string>
     <string name="rbtnOne">All Blue</string>
-    <string name="rbtnTwo">Alternating Lights</string>
+    <string name="rbtnTwo">All Red</string>
     <string name="rbtnThree">All Green</string>
     <string name="chkIP">IP Address</string>
     <string name="chkUVA">UVA</string>
