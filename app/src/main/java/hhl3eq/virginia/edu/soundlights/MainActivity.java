@@ -125,8 +125,9 @@ public class MainActivity extends ActionBarActivity {
     private Menu menu;
     private File selectedFile;
 
-    // TODO: remove after test
-//    private final Semaphore inB = new Semaphore(1);
+    File jsonfile;
+
+    double maxIntensity = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,7 +181,7 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    public void listLocalFiles(){
+    public void listLocalFiles() {
         File f = new File(Environment.getExternalStorageDirectory().toString());
         FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File dir, String filename) {
@@ -195,13 +196,13 @@ public class MainActivity extends ActionBarActivity {
         wavFiles = f.listFiles(filter);
 
         String[] wfNames = new String[wavFiles.length];
-        int i=0;
-        for (File a : wavFiles){
+        int i = 0;
+        for (File a : wavFiles) {
             wfNames[i] = a.getName().toString();
             i++;
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, wfNames){
+                android.R.layout.simple_list_item_1, wfNames) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
@@ -216,7 +217,7 @@ public class MainActivity extends ActionBarActivity {
         listOfFiles.setVisibility(View.VISIBLE);
         listOfFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, final View view,int position, long id) {
+            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
                 selectedFile = wavFiles[position];
             }
         });
@@ -378,30 +379,18 @@ public class MainActivity extends ActionBarActivity {
     public void startSend(View view) {
         boolean chkip = chkIP.isChecked();
         boolean chkuva = chkUVA.isChecked();
-//        json = Tools.prepareJSON(rdgrpChoice);
-//        json = json2;
 
         if (chkip) {
-
             try {
-
-                InputStream is = new FileInputStream(jsonfile.getAbsolutePath());;
-
+                InputStream is = new FileInputStream(jsonfile.getAbsolutePath());
                 int size = is.available();
-
                 byte[] buffer = new byte[size];
-
                 is.read(buffer);
-
                 is.close();
-
                 json = new String(buffer, "UTF-8");
-
-
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-
 
             String ip = txtInputIP.getText().toString();
             Toast.makeText(getBaseContext(), "Sending data to IP address: " + ip, Toast.LENGTH_LONG).show();
@@ -567,8 +556,7 @@ public class MainActivity extends ActionBarActivity {
                 oPlayer.setLooping(true);
                 //listFiles.setVisibility(View.GONE);
                 menu.getItem(1).setIcon(getResources().getDrawable(R.drawable.pause1));
-            }
-            else
+            } else
                 Toast.makeText(getBaseContext(), "Select File First!", Toast.LENGTH_LONG).show();
 
         } else {
@@ -594,7 +582,7 @@ public class MainActivity extends ActionBarActivity {
             isRecording = false;
 
             LayoutInflater layoutInflater
-                    = (LayoutInflater)getBaseContext()
+                    = (LayoutInflater) getBaseContext()
                     .getSystemService(LAYOUT_INFLATER_SERVICE);
             View popupView = layoutInflater.inflate(R.layout.file_name_popup, null);
             final PopupWindow popupWindow = new PopupWindow(
@@ -602,7 +590,7 @@ public class MainActivity extends ActionBarActivity {
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
 
-            Button btnSave = (Button)popupView.findViewById(R.id.save);
+            Button btnSave = (Button) popupView.findViewById(R.id.save);
             popupWindow.setFocusable(true);
             //popupWindow.update();
             fn = (EditText) popupView.findViewById(R.id.fineName);
@@ -629,21 +617,13 @@ public class MainActivity extends ActionBarActivity {
             });
 
             TextView align = (TextView) findViewById(R.id.textView3);
-            popupWindow.showAsDropDown(align, 0 , 0);
-            // TODO: delete after test
-
-//            displayAmplitude();
-
+            popupWindow.showAsDropDown(align, 0, 0);
         }
 
-        try {
-            rawToWave(file, waveFile);
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+        rawToWave(file, waveFile);
+
     }
 
-    double maxIntensity = 0;
 
     private void startBufferedWrite(final File file) {
         new Thread(new Runnable() {
@@ -651,14 +631,19 @@ public class MainActivity extends ActionBarActivity {
             public void run() {
                 DataOutputStream output = null;
                 DataOutputStream output2 = null;
+
                 file2 = new File(Environment.getExternalStorageDirectory(), "amplitude.txt");
+
+                double sum = 0;
+                int readSize = 0;
+
                 try {
                     output2 = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file2)));
                     output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
 
                     while (isRecording) {
-                        double sum = 0;
-                        int readSize = mRecorder.read(mBuffer, 0, mBuffer.length);
+                        sum = 0;
+                        readSize = mRecorder.read(mBuffer, 0, mBuffer.length);
                         for (int i = 0; i < readSize; i++) {
                             output.writeShort(mBuffer[i]);
                             sum += mBuffer[i] * mBuffer[i];
@@ -669,8 +654,8 @@ public class MainActivity extends ActionBarActivity {
                             if (amplitude > maxIntensity) {
                                 maxIntensity = amplitude;
                             }
-                            output2.writeDouble(amplitude);
 
+                            output2.writeDouble(amplitude);
                         }
                     }
 
@@ -683,41 +668,25 @@ public class MainActivity extends ActionBarActivity {
                     }
 
                 } catch (IOException e) {
-                    //Toast.makeText(RecordingLevelSampleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                } finally {
-                    mProgressBar.setProgress(0);
-                    if (output != null) {
-                        try {
-                            output.flush();
-                            output2.flush();
-                        } catch (IOException e) {
-                            System.out.println(e.getMessage());
-                        } finally {
-                            try {
-                                output.close();
-                                output2.close();
-                            } catch (IOException e) {
-                                System.out.println(e.getMessage());
-                            }
-                        }
-                    }
+
                 }
 
+                mProgressBar.setProgress(0);
                 try {
-//                        Toast.makeText(getBaseContext(), "Please wait. Now converting...", Toast.LENGTH_SHORT).show();
-                    rawToDbl(file2);
+                    output.flush();
+                    output2.flush();
+                    output.close();
+                    output2.close();
                 } catch (IOException e) {
                     System.out.println(e.getMessage());
                 }
 
+                rawToDbl(file2);
             }
         }).start();
     }
 
-    //TODO: move this to the top
-    File jsonfile;
-    private void rawToDbl(File rawFile) throws IOException {
-//        byte[] rawData = new byte[(int) rawFile.length()];
+    private void rawToDbl(File rawFile) {
         DataInputStream input = null;
         maxIntensity /= 2;
 
@@ -728,59 +697,83 @@ public class MainActivity extends ActionBarActivity {
 
             // create new data input stream
             input = new DataInputStream(is);
+            String strJSON = buildJSONString(input);
 
-            StringBuilder mytxt = new StringBuilder();
-            mytxt.append("{\"lights\": [");
-            int lightn = 0;
-            double dbl;
+            jsonfile = new File(Environment.getExternalStorageDirectory(), "values.txt");
+            writeToDisk(strJSON, jsonfile.getAbsolutePath());
+            input.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
 
+        }
+    }
+
+    private String buildJSONString(DataInputStream di) {
+        StringBuilder mytxt = new StringBuilder();
+        mytxt.append("{\"lights\": [");
+        int lightn = 0;
+        double dbl;
+        String strLightColor;
+        switch (rdgrpChoice) {
+            case 0:
+                strLightColor = ",\"red\":0,\"green\":0,\"blue\":255,\"intensity\":0.75},";
+                break;
+            case 1:
+                strLightColor = ",\"red\":255,\"green\":0,\"blue\":0,\"intensity\":0.75},";
+                break;
+            case 2:
+                strLightColor = ",\"red\":0,\"green\":255,\"blue\":0,\"intensity\":0.75},";
+                break;
+            default:
+                strLightColor = ",\"red\":255,\"green\":0,\"blue\":0,\"intensity\":0.99},";
+                break;
+        }
+
+        try {
             // read till end of the stream
-            while (input.available() > 0) {
+            while (di.available() > 0) {
                 // read character
-                dbl = input.readDouble();
-                // TODO: ==============================
+                dbl = di.readDouble();
                 mytxt.append("{\"lightId\":");
                 lightn = (int) ((dbl / maxIntensity * 32));
 
                 mytxt.append(lightn);
-                mytxt.append(",\"red\":0,\"green\":255,\"blue\":0,\"intensity\":0.75},");
+                mytxt.append(strLightColor);
             }
-            // indicates completion
-            mytxt.append("{\"lightId\":32,\"red\":255,\"green\":0,\"blue\":0,\"intensity\":0.95}");
-            mytxt.append("],\"propagate\": true}");
+        } catch (IOException ioe) {
 
+        }
 
-            jsonfile = new File(Environment.getExternalStorageDirectory(), "json.txt");
-            FileWriter fw = new FileWriter(jsonfile.getAbsoluteFile());
+        // indicates completion
+        mytxt.append("{\"lightId\":32,\"red\":255,\"green\":0,\"blue\":0,\"intensity\":0.95}");
+        mytxt.append("],\"propagate\": true}");
+
+        return mytxt.toString();
+    }
+
+    private void writeToDisk(String str, String path) {
+        try {
+            FileWriter fw = new FileWriter(path);
             BufferedWriter bw = new BufferedWriter(fw);
-            bw.write(mytxt.toString());
+            bw.write(str);
             bw.flush();
             bw.close();
-        } catch (Exception e) {
-            // if any I/O error occurs
-            e.printStackTrace();
-        } finally {
-            input.close();
+        } catch (IOException ioe) {
+
         }
     }
 
-    private void rawToWave(final File rawFile, final File waveFile) throws IOException {
+    private void rawToWave(final File rawFile, final File waveFile) {
         byte[] rawData = new byte[(int) rawFile.length()];
         DataInputStream input = null;
+        DataOutputStream output = null;
         try {
             input = new DataInputStream(new FileInputStream(rawFile));
             input.read(rawData);
-        } finally {
-            if (input != null) {
-                input.close();
-            }
-        }
+            input.close();
 
-        DataOutputStream output = null;
-        try {
             output = new DataOutputStream(new FileOutputStream(waveFile));
-            // WAVE header
-            // see http://ccrma.stanford.edu/courses/422/projects/WaveFormat/
             writeString(output, "RIFF"); // chunk id
             writeInt(output, 36 + rawData.length); // chunk size
             writeString(output, "WAVE"); // format
@@ -802,10 +795,9 @@ public class MainActivity extends ActionBarActivity {
                 bytes.putShort(s);
             }
             output.write(bytes.array());
-        } finally {
-            if (output != null) {
-                output.close();
-            }
+            output.close();
+        } catch (IOException ioe) {
+
         }
     }
 
@@ -972,8 +964,7 @@ public class MainActivity extends ActionBarActivity {
             upload.execute();
             DisplayFiles display = new DisplayFiles(dropbox, handler);
             display.execute();
-        }
-        else
+        } else
             Toast.makeText(getBaseContext(), "Select File First!", Toast.LENGTH_LONG).show();
     }
 
@@ -987,7 +978,7 @@ public class MainActivity extends ActionBarActivity {
             ArrayList<String> result = msg.getData().getStringArrayList("data");
             fnames = result.toArray(new String[result.size()]);
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, fnames){
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, fnames) {
                 @Override
                 public View getView(int position, View convertView, ViewGroup parent) {
                     View view = super.getView(position, convertView, parent);
@@ -1010,8 +1001,6 @@ public class MainActivity extends ActionBarActivity {
             });
         }
     };
-
-
 
 
     private void startReadingBar() {
