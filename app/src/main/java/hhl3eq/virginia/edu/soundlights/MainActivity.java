@@ -768,7 +768,7 @@ public class MainActivity extends ActionBarActivity {
             // indicates completion
             mytxt.append("{\"lightId\":32,\"red\":255,\"green\":0,\"blue\":0,\"intensity\":0.95}");
             mytxt.append("],\"propagate\": true}");
-            // TODO: send JSON to string file
+            // TODO: send JSON to json file
             // TODO: delete amplitude.txt
             json2 = mytxt.toString();
         } catch (Exception e) {
