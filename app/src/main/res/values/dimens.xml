@@ -5,4 +5,5 @@
     <dimen name="IPIcon_left_offset">15dp</dimen>
     <dimen name="ip_left_offset">45dp</dimen>
     <dimen name="ip_top_offset">10dp</dimen>
+    <dimen name="filesTopView">10dp</dimen>
 </resources>

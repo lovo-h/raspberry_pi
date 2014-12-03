@@ -46,6 +46,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -53,6 +55,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -72,6 +76,7 @@ import com.dropbox.client2.session.TokenPair;
 public class MainActivity extends ActionBarActivity {
     private EditText txtInputIP;
     private String json;
+    private String json2;
     private CheckBox chkIP;
     private CheckBox chkUVA;
 
@@ -97,6 +102,7 @@ public class MainActivity extends ActionBarActivity {
     private int margin_top;
 
     private View settingsMenuView;
+    private View lytFiles;
     private boolean isCollapsedSettingsMenu = true;
 
     private DropboxAPI<AndroidAuthSession> dropbox;
@@ -230,11 +236,58 @@ public class MainActivity extends ActionBarActivity {
         /* used to initialize the program in the background */
         @Override
         protected String doInBackground(View... views) {
+            String[] strIPs = new String[3];
+            // reset empty rows
+            for (int x = 0; x < 3; x++) {
+                currentEmptyRows[x] = true;
+            }
+
+            //Get the text file
+            File file = new File(Environment.getExternalStorageDirectory(), "IPs.txt");
+
+            int ipCount = 0;
+
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                String line;
+
+                while ((line = br.readLine()) != null && ipCount < 3) {
+                    strIPs[ipCount] = line;
+                    currentEmptyRows[ipCount++] = false;
+                }
+            } catch (IOException e) {
+                //You'll need to add proper error handling here
+            }
+
+            EditText txtIP = (EditText) findViewById(R.id.txtInputIP);
+            txtIP.setText(strIPs[0]);
+            TextView saveTxt = (TextView) findViewById(R.id.firstIPDisplay);
+            saveTxt.setText(strIPs[0]);
+            saveTxt = (TextView) findViewById(R.id.secondIPDisplay);
+            saveTxt.setText(strIPs[1]);
+            saveTxt = (TextView) findViewById(R.id.thirdIPDisplay);
+            saveTxt.setText(strIPs[2]);
+
+            View someRow;
+            if (currentEmptyRows[0]) {
+                someRow = findViewById(R.id.firstRow);
+                someRow.setVisibility(View.GONE);
+            }
+            if (currentEmptyRows[1]) {
+                someRow = findViewById(R.id.secondRow);
+                someRow.setVisibility(View.GONE);
+            }
+            if (currentEmptyRows[2]) {
+                someRow = findViewById(R.id.thirdRow);
+                someRow.setVisibility(View.GONE);
+            }
+
             lblRecorderFeedback = (TextView) findViewById(R.id.lblRecorderFeedback);
             txtInputIP = (EditText) findViewById(R.id.txtInputIP);
             chkIP = (CheckBox) findViewById(R.id.chkIP);
             chkUVA = (CheckBox) findViewById(R.id.chkUVA);
             settingsMenuView = findViewById(R.id.settingsMenu);     // used to expand/collapse menu
+            lytFiles = findViewById(R.id.lytFiles);                 // used to expand/collapse menu
 
             bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
             mBuffer = new short[bufferSize];
@@ -319,12 +372,13 @@ public class MainActivity extends ActionBarActivity {
     public void startSend(View view) {
         boolean chkip = chkIP.isChecked();
         boolean chkuva = chkUVA.isChecked();
-        json = Tools.prepareJSON(rdgrpChoice);
+//        json = Tools.prepareJSON(rdgrpChoice);
+        json = json2;
 
         if (chkip) {
             String ip = txtInputIP.getText().toString();
             Toast.makeText(getBaseContext(), "Sending data to IP address: " + ip, Toast.LENGTH_LONG).show();
-            new HttpAsyncTask(json).execute(ip + "/rpi/");
+            new HttpAsyncTask(json).execute(ip + "/rpi");
         }
         if (chkuva) {
             // http://cs4720.cs.virginia.edu/rpi/check.php?username=au753
@@ -405,11 +459,16 @@ public class MainActivity extends ActionBarActivity {
             case R.id.action_settings:
                 if (isCollapsedSettingsMenu) {
                     Tools.expand(settingsMenuView);
+                    if (isLoggedIn) {
+                        Tools.expand(lytFiles);
+                    }
                     isCollapsedSettingsMenu = false;
                 } else {
                     Tools.collapse(settingsMenuView);
+                    Tools.collapse(lytFiles);
                     isCollapsedSettingsMenu = true;
                 }
+
 
                 Toast.makeText(getApplicationContext(), "Settings pressed", Toast.LENGTH_LONG).show();
                 break;
@@ -543,7 +602,8 @@ public class MainActivity extends ActionBarActivity {
             TextView align = (TextView) findViewById(R.id.textView3);
             popupWindow.showAsDropDown(align, 0 , 0);
             // TODO: delete after test
-//            displayAmplitude();
+
+            displayAmplitude();
         }
 
         try {
@@ -553,17 +613,37 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    double maxIntensity = 0;
+
     // TODO: delete after test
     private void displayAmplitude() {
         /* used to list amplitude values as feedback */
         // NOTE: long recordings overflow
         StringBuilder mytxt = new StringBuilder();
-        arrDbl = new MergeSort().mergeSort(arrDbl);
+        mytxt.append("{\"lights\": [");
+        int lightn = 0;
+        int count = arrDbl.size();
         for (Double n : arrDbl) {
-            mytxt.append(Double.toString(n / arrDbl.get(arrDbl.size() - 1)));
-            mytxt.append(", ");
+            // TODO: ==============================
+            if (n == 0) {
+                count--;
+                continue;
+            }
+
+            mytxt.append("{\"lightId\":");
+            lightn = (int) ((n / maxIntensity * 32));
+            mytxt.append(lightn);
+            mytxt.append(", \"red\":0,\"green\":255,\"blue\":0, \"intensity\": 0.75}");
+            if (count > 1) {
+                mytxt.append(",");
+            }
+            count--;
+
         }
-        lblRecorderFeedback.setText(mytxt.toString());
+        mytxt.append("],\"propagate\": true}");
+//        lblRecorderFeedback.setText(mytxt.toString());
+        json2 = mytxt.toString();
+        maxIntensity = 0;
     }
 
     private void startReadingBar() {
@@ -601,7 +681,9 @@ public class MainActivity extends ActionBarActivity {
                         if (readSize > 0) {
                             final double amplitude = sum / readSize;
                             mProgressBar.setProgress((int) Math.sqrt(amplitude) / 50);
-
+                            if (amplitude > maxIntensity) {
+                                maxIntensity = amplitude;
+                            }
                             // TODO: delete after test
                             arrDbl.add(amplitude);
                         }
@@ -713,6 +795,7 @@ public class MainActivity extends ActionBarActivity {
         Toast.makeText(getBaseContext(), "Removed IP", Toast.LENGTH_LONG).show();
         row.getLayoutParams().height = 0;
         row.setVisibility(View.GONE);
+        saveIPsToFile();
     }
 
     public void editIP(View view) {
@@ -747,6 +830,7 @@ public class MainActivity extends ActionBarActivity {
         View row = null;
 
         int x = getEmptyIPSlot();
+        int ptrIP = -1;
 
         // guard
         if (x == -1) {
@@ -758,24 +842,58 @@ public class MainActivity extends ActionBarActivity {
             case 0:
                 saveTxt = (TextView) findViewById(R.id.firstIPDisplay);
                 row = findViewById(R.id.firstRow);
+                ptrIP = 0;
                 break;
             case 1:
                 saveTxt = (TextView) findViewById(R.id.secondIPDisplay);
                 row = findViewById(R.id.secondRow);
+                ptrIP = 1;
                 break;
             case 2:
                 saveTxt = (TextView) findViewById(R.id.thirdIPDisplay);
                 row = findViewById(R.id.thirdRow);
+                ptrIP = 2;
                 break;
         }
 
         LinearLayout.LayoutParams rowParam = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         rowParam.setMargins(margin_left, margin_top, 0, 0);
-
         currentEmptyRows[x] = false;
         row.setLayoutParams(rowParam);
         row.setVisibility(View.VISIBLE);
         saveTxt.setText(txtInputIP.getText());
+        saveIPsToFile();
+    }
+
+    private void saveIPsToFile() {
+        try {
+            StringBuilder myIPs = new StringBuilder();
+            TextView tv;
+
+            if (!currentEmptyRows[0]) {
+                tv = (TextView) findViewById(R.id.firstIPDisplay);
+                myIPs.append(tv.getText().toString());
+                myIPs.append(System.getProperty("line.separator"));
+            }
+            if (!currentEmptyRows[1]) {
+                tv = (TextView) findViewById(R.id.secondIPDisplay);
+                myIPs.append(tv.getText().toString());
+                myIPs.append(System.getProperty("line.separator"));
+            }
+            if (!currentEmptyRows[2]) {
+                tv = (TextView) findViewById(R.id.thirdIPDisplay);
+                myIPs.append(tv.getText().toString());
+            }
+
+            File file = new File(Environment.getExternalStorageDirectory(), "IPs.txt");
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(myIPs.toString());
+            bw.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private int getEmptyIPSlot() {
