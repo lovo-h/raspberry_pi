@@ -145,46 +145,7 @@ public class MainActivity extends ActionBarActivity {
         }
 
         dropbox = new DropboxAPI<AndroidAuthSession>(session);
-
-        File f = new File(Environment.getExternalStorageDirectory().toString());
-        FilenameFilter filter = new FilenameFilter() {
-            public boolean accept(File dir, String filename) {
-                String lowerName = filename.toLowerCase();
-                if (lowerName.endsWith(".wav"))
-                    return true;
-                else
-                    return false;
-            }
-        };
-
-        wavFiles = f.listFiles(filter);
-        //listLocalFiles(wavFiles);
-        String[] wfNames = new String[wavFiles.length];
-        int i=0;
-        for (File a : wavFiles){
-            wfNames[i] = a.getName().toString();
-            i++;
-        }
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, wfNames){
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                TextView text = (TextView) view.findViewById(android.R.id.text1);
-                text.setTextColor(Color.RED);
-                return view;
-            }
-        };
-
-        listOfFiles = (ListView) findViewById(R.id.listView);
-        listOfFiles.setAdapter(adapter);
-        listOfFiles.setVisibility(View.VISIBLE);
-        listOfFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, final View view,int position, long id) {
-                selectedFile = wavFiles[position];
-            }
-        });
+        listLocalFiles();
     }
 
     @Override
@@ -211,9 +172,21 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    public void listLocalFiles(File[] fs){
+    public void listLocalFiles(){
+        File f = new File(Environment.getExternalStorageDirectory().toString());
+        FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File dir, String filename) {
+                String lowerName = filename.toLowerCase();
+                if (lowerName.endsWith(".wav"))
+                    return true;
+                else
+                    return false;
+            }
+        };
 
-        String[] wfNames = new String[fs.length];
+        wavFiles = f.listFiles(filter);
+
+        String[] wfNames = new String[wavFiles.length];
         int i=0;
         for (File a : wavFiles){
             wfNames[i] = a.getName().toString();
@@ -230,6 +203,7 @@ public class MainActivity extends ActionBarActivity {
             }
         };
 
+        listOfFiles = (ListView) findViewById(R.id.listView);
         listOfFiles.setAdapter(adapter);
         listOfFiles.setVisibility(View.VISIBLE);
         listOfFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -557,10 +531,10 @@ public class MainActivity extends ActionBarActivity {
                         File newName = new File(Environment.getExternalStorageDirectory(), fName);
                         Toast.makeText(getBaseContext(), "File saved as " + fName, Toast.LENGTH_LONG).show();
                         waveFile.renameTo(newName);
-                        //listLocalFiles();
+                        listLocalFiles();
                     } else {
                         Toast.makeText(getBaseContext(), "File saved as values.wav", Toast.LENGTH_LONG).show();
-                        //listLocalFiles();
+                        listLocalFiles();
                     }
                     popupWindow.dismiss();
                 }
@@ -840,7 +814,7 @@ public class MainActivity extends ActionBarActivity {
         download.execute();
     }
 
-    private final Handler handler = new Handler() {
+    public Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             ArrayList<String> result = msg.getData().getStringArrayList("data");
             fnames = result.toArray(new String[result.size()]);
@@ -857,20 +831,15 @@ public class MainActivity extends ActionBarActivity {
 
             gridFiles = (GridView) findViewById(R.id.grdFiles);
             gridFiles.setAdapter(adapter);
-
             gridFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     targetFile = new File(Environment.getExternalStorageDirectory(), fnames[position]);
                     DownloadFile download = new DownloadFile(getApplicationContext(), dropbox, targetFile);
                     download.execute();
+                    listLocalFiles();
                 }
             });
-
-
-
-
-
         }
     };
 }
