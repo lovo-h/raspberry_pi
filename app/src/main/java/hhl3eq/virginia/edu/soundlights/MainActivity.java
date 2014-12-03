@@ -403,10 +403,6 @@ public class MainActivity extends ActionBarActivity {
             }
 
 
-
-
-
-
             String ip = txtInputIP.getText().toString();
             Toast.makeText(getBaseContext(), "Sending data to IP address: " + ip, Toast.LENGTH_LONG).show();
             new HttpAsyncTask(json).execute(ip + "/rpi");
@@ -443,10 +439,10 @@ public class MainActivity extends ActionBarActivity {
                 HttpPost httpPost = new HttpPost(url);
 
                 // 3. build jsonObject
-                JSONObject jsonObject = new JSONObject(json);
+//                JSONObject jsonObject = new JSONObject(json);
 
                 // 4. convert JSONObject to JSON to String
-                json = jsonObject.toString();
+//                json = jsonObject.toString();
 
                 // 5. set json to StringEntity
                 StringEntity se = new StringEntity(json);
@@ -619,8 +615,10 @@ public class MainActivity extends ActionBarActivity {
                     if (fName.length() > 0) {
                         File newName = new File(Environment.getExternalStorageDirectory(), fName + ".wav");
                         waveFile.renameTo(newName);
+                        waveFile = newName;
                         File newJSONName = new File(Environment.getExternalStorageDirectory(), fName + ".txt");
                         jsonfile.renameTo(newJSONName);
+                        jsonfile = newJSONName;
                         Toast.makeText(getBaseContext(), "File saved as " + fName, Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(getBaseContext(), "File saved as values.wav", Toast.LENGTH_LONG).show();
@@ -647,50 +645,13 @@ public class MainActivity extends ActionBarActivity {
 
     double maxIntensity = 0;
 
-    // TODO: delete after test
-    private void displayAmplitude() {
-        /* used to list amplitude values as feedback */
-        // NOTE: long recordings overflow
-        StringBuilder mytxt = new StringBuilder();
-        mytxt.append("{\"lights\": [");
-        int lightn = 0;
-        int count = arrDbl.size();
-        for (Double n : arrDbl) {
-            // TODO: ==============================
-            if (n == 0) {
-                count--;
-                continue;
-            }
-
-            mytxt.append("{\"lightId\":");
-            lightn = (int) ((n / maxIntensity * 32));
-            mytxt.append(lightn);
-            mytxt.append(", \"red\":0,\"green\":255,\"blue\":0, \"intensity\": 0.75}");
-            if (count > 1) {
-                mytxt.append(",");
-            }
-            count--;
-
-        }
-        mytxt.append("],\"propagate\": true}");
-//        lblRecorderFeedback.setText(mytxt.toString());
-        json2 = mytxt.toString();
-        maxIntensity = 0;
-    }
-
-
-
-    // TODO: Delete after testing
-    ArrayList<Double> arrDbl = new ArrayList<Double>();
-
     private void startBufferedWrite(final File file) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 DataOutputStream output = null;
                 DataOutputStream output2 = null;
-                File file2 = new File(Environment.getExternalStorageDirectory(), "amplitude.txt");
-                String[] strDbl = new String[1];
+                file2 = new File(Environment.getExternalStorageDirectory(), "amplitude.txt");
                 try {
                     output2 = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file2)));
                     output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
@@ -708,22 +669,10 @@ public class MainActivity extends ActionBarActivity {
                             if (amplitude > maxIntensity) {
                                 maxIntensity = amplitude;
                             }
-                            // TODO: delete after test
-//                            arrDbl.add(amplitude);
                             output2.writeDouble(amplitude);
 
                         }
                     }
-
-
-                    try {
-//                        Toast.makeText(getBaseContext(), "Please wait. Now converting...", Toast.LENGTH_SHORT).show();
-                        rawToDbl(file2);
-                    } catch (IOException e) {
-                        System.out.println(e.getMessage());
-                    }
-
-
                 } catch (IOException e) {
                     //Toast.makeText(RecordingLevelSampleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 } finally {
@@ -744,6 +693,14 @@ public class MainActivity extends ActionBarActivity {
                         }
                     }
                 }
+
+                try {
+//                        Toast.makeText(getBaseContext(), "Please wait. Now converting...", Toast.LENGTH_SHORT).show();
+                    rawToDbl(file2);
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
+                }
+
             }
         }).start();
     }
@@ -762,7 +719,6 @@ public class MainActivity extends ActionBarActivity {
 
             // create new data input stream
             input = new DataInputStream(is);
-
 
             StringBuilder mytxt = new StringBuilder();
             mytxt.append("{\"lights\": [");
@@ -791,8 +747,6 @@ public class MainActivity extends ActionBarActivity {
             bw.write(mytxt.toString());
             bw.flush();
             bw.close();
-
-            json2 = mytxt.toString();
         } catch (Exception e) {
             // if any I/O error occurs
             e.printStackTrace();
