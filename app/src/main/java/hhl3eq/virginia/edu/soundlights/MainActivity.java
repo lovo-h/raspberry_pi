@@ -658,15 +658,6 @@ public class MainActivity extends ActionBarActivity {
                             output2.writeDouble(amplitude);
                         }
                     }
-
-                    try {
-                        Toast.makeText(getBaseContext(), "Please wait. Now converting...", Toast.LENGTH_SHORT).show();
-                        //TODO: delete after test
-                        rawToDbl(file2);
-                    } catch (IOException e) {
-                        System.out.println(e.getMessage());
-                    }
-
                 } catch (IOException e) {
 
                 }
